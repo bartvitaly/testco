@@ -6,11 +6,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.BeforeMethod;
@@ -38,20 +41,19 @@ public class Initialize {
 	@BeforeMethod(groups = { "demo" })
 	public WebDriver init() {
 		String browser = PropertiesUtils.get("browser");
-		String chromeDriver = PropertiesUtils.get("webdriver.chrome.driver");
-		String iexploreDriver = PropertiesUtils.get("webdriver.iexplore.driver");
-
-		File file;
+				
 		if (browser.equals("chrome")) {
-			file = new File(chromeDriver);
-			System.setProperty("webdriver.chrome.driver", file.getAbsolutePath());
+			System.setProperty("webdriver.chrome.driver", (new File("drivers/chromedriver.exe")).getAbsolutePath());
 			driver.set(new ChromeDriver());
-		} else if (browser.equals("iexplore")) {
-			file = new File(iexploreDriver);
-			System.setProperty("webdriver.iexplore.driver", file.getAbsolutePath());
-			driver.set(new InternetExplorerDriver());
+		} else if (browser.equals("ie")) {
+			DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+			capabilities.setCapability("ignoreZoomSetting", true);
+			capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+			capabilities.setCapability("requireWindowFocus", true);
+			System.setProperty("webdriver.ie.driver", (new File("drivers/IEDriverServer.exe")).getAbsolutePath());
+			driver.set(new InternetExplorerDriver(capabilities));
 		} else if (browser.equals("firefox")) {
-			driver.set(new FirefoxDriver());
+			driver.set(new MarionetteDriver());
 		} else {
 			driver.set(new HtmlUnitDriver());
 		}
@@ -59,15 +61,16 @@ public class Initialize {
 		driver.get().manage().timeouts().implicitlyWait(Integer.parseInt(PropertiesUtils.get("timeout")),
 				TimeUnit.SECONDS);
 		driver.get().manage().deleteAllCookies();
+		driver.get().manage().window().maximize();
 
 		return driver.get();
 	}
 
 	@AfterMethod(groups = { "demo" })
 	public void tear() {
-		WebDriverCommon.takeScreenshot(driver.get());
-		driver.get().close();
-		driver.get().quit();
+//		WebDriverCommon.takeScreenshot(driver.get());
+//		driver.get().close();
+//		driver.get().quit();
 	}
 
 }

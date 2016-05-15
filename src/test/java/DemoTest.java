@@ -54,17 +54,17 @@ public class DemoTest extends Initialize {
 		login(user);
 	}
 
-	@Test(groups = { "demo" }, dependsOnMethods = "student")
-	public void teacher() throws Exception {
-		User teacher = CsvFileReader.readCsvFile((new File(".")).getCanonicalPath() + "\\users.csv", "teacher").get(0);
-		login(teacher);
-	}
-	
-	@Test(groups = { "demo" }, dependsOnMethods = "teacher")
-	public void supervisor() throws Exception {
-		User supervisor = CsvFileReader.readCsvFile((new File(".")).getCanonicalPath() + "\\users.csv", "supervisor").get(0);
-		login(supervisor);
-	}
+//	@Test(groups = { "demo" }, dependsOnMethods = "student")
+//	public void teacher() throws Exception {
+//		User teacher = CsvFileReader.readCsvFile((new File(".")).getCanonicalPath() + "\\users.csv", "teacher").get(0);
+//		login(teacher);
+//	}
+//	
+//	@Test(groups = { "demo" }, dependsOnMethods = "teacher")
+//	public void supervisor() throws Exception {
+//		User supervisor = CsvFileReader.readCsvFile((new File(".")).getCanonicalPath() + "\\users.csv", "supervisor").get(0);
+//		login(supervisor);
+//	}
 	
 	/**
 	 * This is a login method
