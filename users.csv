@@ -1,0 +1,5 @@
+username,password,type
+TestcoTeacher1,testcoteacher1,teacher
+TestcoSupervisor1,testcosupervisor1,supervisor
+testcostudent8_testcoparent3,testcostudent8,student
+testcostudent9_testcoparent3,testcostudent9,student

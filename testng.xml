@@ -1,0 +1,7 @@
+<suite name="Test-class Suite" parallel="methods">
+    <test name="student">
+        <classes>
+            <class name="test.java.DemoTest" />
+        </classes>
+    </test>
+</suite>
