@@ -66,11 +66,4 @@ public class Initialize {
 		return driver.get();
 	}
 
-	@AfterMethod(groups = { "demo" })
-	public void tear() {
-//		WebDriverCommon.takeScreenshot(driver.get());
-//		driver.get().close();
-//		driver.get().quit();
-	}
-
 }

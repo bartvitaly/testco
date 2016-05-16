@@ -12,6 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,28 @@ public class Common {
 		return RandomStringUtils.random(length, "abcdefghijklmnopqrstuvwxyz");
 	}
 
+	/**
+	 * This method is to generate random string with words count
+	 * 
+	 * @param length
+	 * @return String
+	 * 
+	 */
+	public static String randomStringWordsCount(int numberOfWords) {
+	    String[] randomStrings = new String[numberOfWords];
+	    Random random = new Random();
+	    for(int i = 0; i < numberOfWords; i++)
+	    {
+	        char[] word = new char[random.nextInt(8) + 3];
+	        for(int j = 0; j < word.length; j++)
+	        {
+	            word[j] = (char)('a' + random.nextInt(26));
+	        }
+	        randomStrings[i] = new String(word);
+	    }
+	    return arrayToString(randomStrings);
+	}
+	
 	/**
 	 * This method is to convert an array to string
 	 * 

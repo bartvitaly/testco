@@ -99,7 +99,7 @@ public class WebDriverCommon {
 	 */
 	protected static WebElement waitForElement(WebDriver driver, final By by, int timeout) {
 
-		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout * 1000);
+		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
 
 		driver.manage().timeouts().setScriptTimeout(timeout, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
@@ -116,7 +116,7 @@ public class WebDriverCommon {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * This method is to wait for a list of elements appear on the page
 	 * 
@@ -127,7 +127,7 @@ public class WebDriverCommon {
 	 */
 	protected static List<WebElement> waitForElements(WebDriver driver, final By by, int timeout) {
 
-		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout * 1000);
+		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
 
 		driver.manage().timeouts().setScriptTimeout(timeout, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
@@ -305,6 +305,19 @@ public class WebDriverCommon {
 		return waitForElement(driver, by, timeout);
 	}
 
+	/**
+	 * This method is to check that an element exist on the page
+	 * 
+	 * @param by
+	 * 
+	 */
+	protected Boolean present(final By by) {
+		if (getElement(by, 5) != null) {
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * This method is to get an element using By object with default timeout
 	 * 

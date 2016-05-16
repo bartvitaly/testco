@@ -7,6 +7,8 @@ import java.util.Iterator;
 
 /**
  * 
+ * This class describes a user entity
+ * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -19,6 +21,7 @@ public class User {
 	 * 
 	 * @param name
 	 * @param password
+	 * @param type
 	 * 
 	 */
 	public User(String name, String password, String type) {
@@ -27,6 +30,13 @@ public class User {
 		this.type = type;
 	}
 
+	/**
+	 * This method is to create data type readable for TestNG data provider
+	 * 
+	 * @param users
+	 * @param size
+	 * 
+	 */
 	public static User[][] getUsers(ArrayList<User> users, int size) throws IOException {
 		User[][] dataProviderArray = new User[size][1];
 

@@ -13,32 +13,42 @@ import com.brainchase.items.User;
  * @author vbartashchuk@testco.com
  * 
  */
-public class Dashboard extends WebDriverCommon {
+public class LoginPage extends Menu {
 
 	private final WebDriver driver;
-	final static Logger logger = Logger.getLogger(Dashboard.class);
+	final static Logger logger = Logger.getLogger(LoginPage.class);
 
-	By introductory = By.cssSelector("[id=Introductory1]");
-	By videoClose = By.cssSelector(".fancybox-close");
-	
-	
+	By username = By.cssSelector("[id=edit-name]");
+	By password = By.cssSelector("[id=edit-pass]");
+	By submit = By.cssSelector("[id=edit-submit]");
+
 	/**
 	 * This is constructor that sets a web driver for the page object
 	 * 
 	 * @param driver
 	 * @throws InterruptedException
 	 */
-	public Dashboard(WebDriver driver) throws InterruptedException {
+	public LoginPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		this.driver = driver;
+		
+		if (present(logout)) {
+			click(logout);
+		}
 	}
 
 	/**
 	 * This method logs in a user
 	 * 
 	 * @param User
+	 * @return 
+	 * @throws InterruptedException 
 	 */
-	public void login(User user) {
+	public DashboardPage login(User user) throws InterruptedException {
+		type(username, user.name);
+		type(password, user.password);
+		click(submit);
+		return new DashboardPage(driver);
 	}
 
 }
