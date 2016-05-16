@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,12 +19,16 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.RandomStringUtils;
 
+import org.apache.log4j.Logger;
+
 /**
  * 
  * @author vbartashchuk@testco.com
  *
  */
 public class Common {
+
+	final static Logger logger = Logger.getLogger(Common.class);
 
 	/**
 	 * This method is to generate random string
@@ -44,20 +49,18 @@ public class Common {
 	 * 
 	 */
 	public static String randomStringWordsCount(int numberOfWords) {
-	    String[] randomStrings = new String[numberOfWords];
-	    Random random = new Random();
-	    for(int i = 0; i < numberOfWords; i++)
-	    {
-	        char[] word = new char[random.nextInt(8) + 3];
-	        for(int j = 0; j < word.length; j++)
-	        {
-	            word[j] = (char)('a' + random.nextInt(26));
-	        }
-	        randomStrings[i] = new String(word);
-	    }
-	    return arrayToString(randomStrings);
+		String[] randomStrings = new String[numberOfWords];
+		Random random = new Random();
+		for (int i = 0; i < numberOfWords; i++) {
+			char[] word = new char[random.nextInt(8) + 3];
+			for (int j = 0; j < word.length; j++) {
+				word[j] = (char) ('a' + random.nextInt(26));
+			}
+			randomStrings[i] = new String(word);
+		}
+		return arrayToString(randomStrings);
 	}
-	
+
 	/**
 	 * This method is to convert an array to string
 	 * 
@@ -122,18 +125,23 @@ public class Common {
 	 * 
 	 * @param path
 	 * @param text
+	 * @throws IOException
 	 * 
 	 */
-	public static void writeToFile(String path, String text) {
-		Writer writer = null;
+	public static void writeToFile(String path, String text) throws IOException {
+		 Writer writer = null;
 
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
 			writer.write(text);
+//			Files.write(Paths.get(path), text.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException ex) {
+//			logger.info("Can't write to a file '" + path + "', trying again...");
+//			Files.write(Paths.get(path), System.getProperty("line.separator").getBytes(), StandardOpenOption.APPEND);
+//			Files.write(Paths.get(path), text.getBytes(), StandardOpenOption.APPEND);
 		} finally {
 			try {
-				writer.close();
+				 writer.close();
 			} catch (Exception ex) {
 			}
 		}

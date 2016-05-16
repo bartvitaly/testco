@@ -12,6 +12,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.brainchase.common.Common;
 import com.brainchase.common.CsvFileReader;
 import com.brainchase.common.PropertiesUtils;
 import com.brainchase.common.SoftAssert;
@@ -35,6 +36,10 @@ public class DemoTest extends Initialize {
 	private Logger logger = Logger.getLogger(this.getClass());
 	private SoftAssert m_assert;
 
+	static ArrayList<User> users = new ArrayList<User>();
+	static ArrayList<Student> students = new ArrayList<Student>();
+	static ArrayList<User> allUsers = new ArrayList<User>();
+
 	@BeforeMethod(groups = { "demo" })
 	public void setUp() throws Exception {
 		TestNGReportAppender appender = new TestNGReportAppender();
@@ -48,50 +53,62 @@ public class DemoTest extends Initialize {
 	 * This is data provider for running the same test with different data
 	 * 
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@DataProvider(parallel = true, name = "demoProvider")
 	public static User[][] user() throws IOException {
-		ArrayList<User> users = new ArrayList<User>();
-		users = CsvFileReader.readUsersFile((new File(".")).getCanonicalPath() + "\\users.csv", "student");
+		users = CsvFileReader.readUsersFile((new File(".")).getCanonicalPath() + "\\users.csv", "student").get(0);
+		allUsers = CsvFileReader.readUsersFile((new File(".")).getCanonicalPath() + "\\users.csv", "student").get(1);
 		return User.getUsers(users, PropertiesUtils.getInt("students_number"));
 	}
-	
+
 	@Test(groups = { "demo" }, dataProvider = "demoProvider")
 	public void student(User user) throws Exception {
-		Student student = new Student(user.name, user.password, user.type);
-		
+		final Student student = new Student(user.name, user.password, user.type);
 		logger.info("Open login page, fill username and password and click login");
 		DashboardPage dashboardPage = login(user);
-		
+
 		logger.info("A student submits challenges");
 		dashboardPage.submitChallenges(student);
-		
+
 		logger.info("A student logs out");
 		dashboardPage.logout();
+		
+		students.add(student);
 	}
 
-	@Test(groups = { "demo" }, dependsOnMethods = "student")
-	public void teacher() throws Exception {
-		User teacher = CsvFileReader.readUsersFile((new File(".")).getCanonicalPath() + "\\users.csv", "teacher").get(0);
-		login(teacher);
-	}
-	
-	@Test(groups = { "demo" }, dependsOnMethods = "teacher")
-	public void supervisor() throws Exception {
-		User supervisor = CsvFileReader.readUsersFile((new File(".")).getCanonicalPath() + "\\users.csv", "supervisor").get(0);
-		login(supervisor);
-	}
-	
+	// @Test(groups = { "demo" }, dependsOnMethods = "student")
+	// public void teacher() throws Exception {
+	// User teacher = CsvFileReader.readUsersFile((new
+	// File(".")).getCanonicalPath() + "\\users.csv", "teacher").get(0).get(0);
+	// login(teacher);
+	// }
+	//
+	// @Test(groups = { "demo" }, dependsOnMethods = "teacher")
+	// public void supervisor() throws Exception {
+	// User supervisor = CsvFileReader.readUsersFile((new
+	// File(".")).getCanonicalPath() + "\\users.csv",
+	// "supervisor").get(0).get(0);
+	// login(supervisor);
+	// }
+
 	@AfterMethod(groups = { "demo" })
-	public void tear() {
-		WebDriverCommon.takeScreenshot(driver.get());
+	public void tear() throws IOException {
+		Student.writeTransactions(students);
+		// WebDriverCommon.takeScreenshot(driver.get());
 		driver.get().close();
 		driver.get().quit();
 		logger.removeAllAppenders();
 		m_assert.assertAll();
 	}
-	
+
+	/**
+	 * This method is used to login
+	 * 
+	 * @param user
+	 * @return DashboardPage
+	 * @throws IOException
+	 */
 	public DashboardPage login(User user) throws InterruptedException {
 		logger.info("Open login page, fill username and password and click login");
 		LoginPage loginPage = new LoginPage(driver.get());

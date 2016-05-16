@@ -1,9 +1,14 @@
 package com.brainchase.pages;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
+import com.brainchase.common.Common;
 import com.brainchase.common.WebDriverCommon;
 import com.brainchase.items.Challenge;
 import com.brainchase.items.Student;
@@ -19,17 +24,21 @@ public class DashboardPage extends Menu {
 
 	private final WebDriver driver;
 	final static Logger logger = Logger.getLogger(DashboardPage.class);
+	static String CHALLENGE_SUBMITTED = "challenge-status-2";
+
+	static By welcomePopup = By.cssSelector("[style*='visible'] .joyride-close-tip");
 
 	By introductory = By.cssSelector("[id=Introductory1]");
 	By videoClose = By.cssSelector(".fancybox-close");
 	By weekContainer = By.cssSelector(".week-container");
-	By engineeringChallenge = By.cssSelector("[style*='engineering']");
-	By mathChallenge = By.cssSelector("[style*='math']");
-	By readingChallenge = By.cssSelector("[style*='reading']");
-	By writingChallenge = By.cssSelector("[style*='writing']");
-	By artChallenge = By.cssSelector("[style*='art']");
-	By bonusChallenge = By.cssSelector("[style*='bonus']");
-	
+
+	static By engineeringChallenge = By.cssSelector("[style*='engineering']");
+	static By mathChallenge = By.cssSelector("[style*='math']");
+	static By readingChallenge = By.cssSelector("[style*='reading']");
+	static By writingChallenge = By.cssSelector("[style*='writing']");
+	static By artChallenge = By.cssSelector("[style*='art']");
+	static By bonusChallenge = By.cssSelector("[style*='bonus']");
+
 	/**
 	 * This is constructor that sets a web driver for the page object
 	 * 
@@ -39,59 +48,80 @@ public class DashboardPage extends Menu {
 	public DashboardPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		this.driver = driver;
+
+		if (present(welcomePopup)) {
+			click(welcomePopup);
+		}
+
 	}
 
 	/**
 	 * This method logs in a user
 	 * 
 	 * @param challenge
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public ChallengePage openChallenge(Challenge challenge) throws InterruptedException {
-		switch (challenge.type) {
-	        case "art":
-	        	click(artChallenge);
-	        	break;
-	        case "bonus":
-	        	click(bonusChallenge);
-	        	break;
-	        case "engineering":
-	        	click(engineeringChallenge);
-	        	break;
-	        case "math":
-	        	click(mathChallenge);
-	        	break;
-	        case "reading":
-	        	click(readingChallenge);
-	        	break;
-	        case "writing":
-	        	click(writingChallenge);
-	        	break;
+		// If Challenges are not enabled click introductory video and close it
+		// then
+		if (getAttribute(engineeringChallenge, "style").contains("block")) {
+			click(introductory);
+			click(videoClose);
+			driver.navigate().refresh();
 		}
+
+		// Open a challenge
+		click(getChallengeElement(challenge.type));
+
 		return new ChallengePage(driver);
 	}
 
 	/**
-	 * This method logs in a user
+	 * This method opens and submits challenges dedicated to a student
 	 * 
-	 * @param challenge
-	 * @throws InterruptedException 
+	 * @param student
+	 * @throws InterruptedException
+	 * @throws IOException
 	 */
-	public void submitChallenge(Challenge challenge) throws InterruptedException {
-		ChallengePage challengePage = openChallenge(challenge);
-		challengePage.submitChallenge(challenge);
-	}
-	
-	/**
-	 * This method logs in a user
-	 * 
-	 * @param challenge
-	 * @throws InterruptedException 
-	 */
-	public void submitChallenges(Student student) throws InterruptedException {
+	public void submitChallenges(Student student) throws InterruptedException, IOException {
 		for (int i = 0; i < student.challenges.size(); i++) {
-			submitChallenge(student.challenges.get(i));
+			if (getAttribute(getChallengeElement(student.challenges.get(i).type), "class")
+					.equals(CHALLENGE_SUBMITTED)) {
+				student.challengesProgress.add(
+						student.name + "," + student.challenges.get(i).type + ",the challenge is already submitted");
+			} else {
+				ChallengePage challengePage = openChallenge(student.challenges.get(i));
+				challengePage.submitChallenge(student, i);
+				student.challengesProgress.add(student.name + "," + student.challenges.get(i).type + ","
+						+ student.challenges.get(i).transactionId);
+			}
 		}
 	}
-	
+
+	/**
+	 * This method returns a By locator for a challenge type
+	 * 
+	 * @param type
+	 */
+	static By getChallengeElement(String type) {
+		switch (type) {
+		case "art":
+			return artChallenge;
+		case "bonus":
+			return bonusChallenge;
+		case "engineering":
+			return engineeringChallenge;
+		case "math":
+			return mathChallenge;
+		case "reading":
+			return readingChallenge;
+		case "writing":
+			return writingChallenge;
+		default:
+			logger.fatal("The type passed '" + type
+					+ "' is not in scope of: art, bonus, engineering, math, reading, writing");
+		}
+		return null;
+	}
+
 }

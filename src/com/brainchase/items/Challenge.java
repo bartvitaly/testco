@@ -9,7 +9,7 @@ import com.brainchase.common.Common;
  */
 public class Challenge {
 
-	public String type, externalLink, response, image, answer;
+	public String type, externalLink, response, image, answer, transactionId;
 	
 	/**
 	 * This is constructor of the class
@@ -19,6 +19,7 @@ public class Challenge {
 	 * @param response
 	 * @param image
 	 * @param answer
+	 * @param transactionId
 	 * 
 	 */
 	public Challenge(String type, String externalLink, String response, String image, String answer) {

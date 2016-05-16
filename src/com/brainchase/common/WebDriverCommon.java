@@ -17,7 +17,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
@@ -97,8 +100,8 @@ public class WebDriverCommon {
 	 * @param timeout
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	protected static WebElement waitForElement(WebDriver driver, final By by, int timeout) {
-
 		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
 
 		driver.manage().timeouts().setScriptTimeout(timeout, TimeUnit.SECONDS);
@@ -312,7 +315,7 @@ public class WebDriverCommon {
 	 * 
 	 */
 	protected Boolean present(final By by) {
-		if (getElement(by, 5) != null) {
+		if (getElement(by, 0) != null) {
 			return true;
 		}
 		return false;

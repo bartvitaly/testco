@@ -31,7 +31,7 @@ public class LoginPage extends Menu {
 	public LoginPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		this.driver = driver;
-		
+
 		if (present(logout)) {
 			click(logout);
 		}
@@ -41,8 +41,8 @@ public class LoginPage extends Menu {
 	 * This method logs in a user
 	 * 
 	 * @param User
-	 * @return 
-	 * @throws InterruptedException 
+	 * @return
+	 * @throws InterruptedException
 	 */
 	public DashboardPage login(User user) throws InterruptedException {
 		type(username, user.name);

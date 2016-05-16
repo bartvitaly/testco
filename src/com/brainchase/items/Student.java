@@ -3,9 +3,8 @@ package com.brainchase.items;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import com.brainchase.common.CsvFileReader;
+import com.brainchase.common.Common;
 
 /**
  * 
@@ -17,6 +16,7 @@ import com.brainchase.common.CsvFileReader;
 public class Student extends User {
 
 	public ArrayList<Challenge> challenges = new ArrayList<Challenge>();
+	public ArrayList<String> challengesProgress = new ArrayList<String>();
 	
 	/**
 	 * This is constructor of the class
@@ -28,8 +28,30 @@ public class Student extends User {
 	 * 
 	 */
 	public Student(String name, String password, String type) throws IOException {
-		super(name, password, type);		
-		this.challenges = CsvFileReader.readChallengesFile((new File(".")).getCanonicalPath() + "\\challenges.csv", name);
+		super(name, password, type);
+		this.challenges.add(new Challenge("art"));
+		this.challenges.add(new Challenge("engineering"));
+//		this.challenges.add(new Challenge("writing"));
+		
+//		this.challenges = CsvFileReader.readChallengesFile((new File(".")).getCanonicalPath() + "\\challenges.csv", name);
+	}
+	
+	/**
+	 * This method is used to write transaction ids to file
+	 * 
+	 * @param user
+	 * @return DashboardPage
+	 * @throws IOException
+	 */
+	public static void writeTransactions(ArrayList<Student> students) throws IOException {
+		String toPrint = "student_name,challenge_type,transaction_id";
+		for (int i = 0; i < students.size(); i++) {
+			ArrayList<String> challengesProgress = students.get(i).challengesProgress;
+			for (int j = 0; j < challengesProgress.size(); j++) {				
+				toPrint = toPrint + "\r\n" + challengesProgress.get(j);
+			}
+		}
+		Common.writeToFile((new File(".")).getCanonicalPath() + "\\transactions.csv", toPrint);
 	}
 	
 }

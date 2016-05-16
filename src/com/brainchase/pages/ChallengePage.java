@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import com.brainchase.items.Challenge;
+import com.brainchase.items.Student;
 
 /**
  * This class describes a challenge page of the web site and the page elements
@@ -18,15 +19,15 @@ public class ChallengePage extends Menu {
 	final static Logger logger = Logger.getLogger(ChallengePage.class);
 
 	By closeModal = By.cssSelector(".close-reveal-modal");
-	
+
+	By transactionId = By.cssSelector("[name='transaction_id']");
 	By externalLink = By.cssSelector("[id=edit-external-url]");
 	By response = By.cssSelector("[id=edit-student-input]");
 	By answer = By.cssSelector("[id=edit-answer]");
-	
+
 	By submit = By.cssSelector("[id=submit-final]");
-	
 	By backToDashboard = By.cssSelector(".button[href*=dashboard]");
-	
+
 	/**
 	 * This is constructor that sets a web driver for the page object
 	 * 
@@ -36,8 +37,8 @@ public class ChallengePage extends Menu {
 	public ChallengePage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		this.driver = driver;
-		
-//		Close modal dialog
+
+		// Close modal dialog
 		if (present(closeModal)) {
 			click(closeModal);
 		}
@@ -47,25 +48,36 @@ public class ChallengePage extends Menu {
 	 * This method logs in a user
 	 * 
 	 * @param challenge
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
-	public DashboardPage submitChallenge(Challenge challenge) throws InterruptedException {
-		if (!present(backToDashboard)) {
-			if (present(externalLink)) {
-				type(externalLink, challenge.externalLink);
-			}
-			if (present(response)) {
-				type(response, challenge.response);
-			}
-			if (present(answer)) {
-				type(answer, challenge.answer);
+	public void submitChallenge(Student student, int i) throws InterruptedException {
+		// Get transaction_id, if it is not exist then it will be assumed that a
+		// challenge is already submitted
+		if (!present(transactionId)) {
+			student.challenges.get(i).transactionId = "TransactionId is not present on the challenge page.";
+		} else {
+			// Adding transaction_id to a Student object
+			student.challenges.get(i).transactionId = getAttribute(transactionId, "value");
+
+			// Complete a challenge
+			switch (student.challenges.get(i).type) {
+			case "art":
+				type(externalLink, student.challenges.get(i).externalLink);
+				type(response, student.challenges.get(i).response);
+				break;
+			case "engineering":
+				type(externalLink, student.challenges.get(i).externalLink);
+				type(response, student.challenges.get(i).response);
+				break;
+			case "writing":
+				type(response, student.challenges.get(i).response);
+				break;
 			}
 			click(submit);
 		}
-		else {
-			click(backToDashboard);
-		}
-		return new DashboardPage(driver);
+
+		// Returning back to dashboard
+		click(backToDashboard);
 	}
 
 }

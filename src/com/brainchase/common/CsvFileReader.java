@@ -39,7 +39,7 @@ public class CsvFileReader {
 	private static final String READING = "reading";
 	private static final String WRITING = "writing";
 
-	public static ArrayList<User> readUsersFile(String fileName, String type) {
+	public static ArrayList<ArrayList<User>> readUsersFile(String fileName, String type) {
 
 		FileReader fileReader = null;
 
@@ -49,6 +49,7 @@ public class CsvFileReader {
 		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(USERS_HEADER_MAPPING);
 
 		ArrayList<User> users = new ArrayList<User>();
+		ArrayList<User> allUsers = new ArrayList<User>();
 		try {
 			// initialize FileReader object
 			fileReader = new FileReader(fileName);
@@ -69,6 +70,7 @@ public class CsvFileReader {
 				if (user.type.equals(type)) {
 					users.add(user);
 				}
+				allUsers.add(user);
 			}
 
 		} catch (Exception e) {
@@ -83,7 +85,10 @@ public class CsvFileReader {
 				e.printStackTrace();
 			}
 		}
-		return users;
+		ArrayList<ArrayList<User>> usersToReturn = new ArrayList<ArrayList<User>>();
+		usersToReturn.add(users);
+		usersToReturn.add(allUsers);
+		return usersToReturn;
 
 	}
 

@@ -30,7 +30,7 @@ public class Initialize {
 
 	protected static ThreadLocal<WebDriver> driver = new ThreadLocal<WebDriver>();
 	final static Logger logger = Logger.getLogger(Initialize.class);
-	
+
 	@BeforeGroups(groups = { "demo" })
 	public void setAppender() {
 		BasicConfigurator.configure();
@@ -41,7 +41,7 @@ public class Initialize {
 	@BeforeMethod(groups = { "demo" })
 	public WebDriver init() {
 		String browser = PropertiesUtils.get("browser");
-				
+
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver", (new File("drivers/chromedriver.exe")).getAbsolutePath());
 			driver.set(new ChromeDriver());
