@@ -1,6 +1,7 @@
 package com.brainchase.common;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -8,7 +9,6 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.RandomStringUtils;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -30,6 +29,17 @@ public class Common {
 
 	final static Logger logger = Logger.getLogger(Common.class);
 
+	/**
+	 * This method is to get canonical path
+	 * 
+	 * @return String
+	 * @throws IOException 
+	 * 
+	 */
+	public static String canonicalPath() throws IOException {
+		return (new File(".")).getCanonicalPath();
+	}
+	
 	/**
 	 * This method is to generate random string
 	 * 
@@ -147,4 +157,25 @@ public class Common {
 		}
 	}
 
+	/**
+	 * This method is used to write transaction ids to file
+	 * 
+	 * @param user
+	 * @return DashboardPage
+	 * @throws IOException
+	 */
+	public static void writeTransactions(String path, ArrayList<ArrayList<String>> transactions) throws IOException {
+		String toPrint = "student_name,challenge_type,transaction_id";
+		ArrayList<String> transaction = new ArrayList<>();
+		
+		for (int j = 0; j < transactions.size(); j++) {
+			transaction = transactions.get(j);
+			toPrint = toPrint + "\r\n";
+			for (int j2 = 0; j2 < transaction.size(); j2++) {					
+				toPrint = toPrint + transaction.get(j2) + ",";
+			}
+		}
+		Common.writeToFile(path, toPrint);
+	}
+	
 }

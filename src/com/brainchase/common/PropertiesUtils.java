@@ -25,7 +25,7 @@ public class PropertiesUtils {
 		Properties properties = new Properties();
 		String result = "";
 		try {
-			properties.load(new BufferedReader(new FileReader((new File(".")).getCanonicalPath() + TEST_PROPERTIES)));
+			properties.load(new BufferedReader(new FileReader(Common.canonicalPath() + TEST_PROPERTIES)));
 			result = properties.getProperty(key);
 		} catch (Exception e) {
 			e.printStackTrace();

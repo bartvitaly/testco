@@ -18,9 +18,9 @@ public class LoginPage extends Menu {
 	private final WebDriver driver;
 	final static Logger logger = Logger.getLogger(LoginPage.class);
 
-	By username = By.cssSelector("[id=edit-name]");
-	By password = By.cssSelector("[id=edit-pass]");
-	By submit = By.cssSelector("[id=edit-submit]");
+	private static By username = By.cssSelector("[id=edit-name]");
+	private static By password = By.cssSelector("[id=edit-pass]");
+	private static By submit = By.cssSelector("[id=edit-submit]");
 
 	/**
 	 * This is constructor that sets a web driver for the page object
@@ -44,11 +44,18 @@ public class LoginPage extends Menu {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public DashboardPage login(User user) throws InterruptedException {
+	public Object login(User user) throws InterruptedException {
 		type(username, user.name);
 		type(password, user.password);
 		click(submit);
-		return new DashboardPage(driver);
+		
+		switch (user.type) {
+			case "teacher":
+				return new DashboardTeacherPage(driver);
+			case "supervisor":
+				return new DashboardSupervisorPage(driver);
+		}
+		return new DashboardStudentPage(driver);
 	}
 
 }

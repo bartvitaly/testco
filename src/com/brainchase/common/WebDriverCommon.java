@@ -17,10 +17,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
@@ -60,7 +57,7 @@ public class WebDriverCommon {
 		logger.info("Taking screenshot.");
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
-			FileUtils.copyFile(scrFile, new File((new File(".")).getCanonicalPath() + fileName));
+			FileUtils.copyFile(scrFile, new File(Common.canonicalPath() + fileName));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -119,7 +116,7 @@ public class WebDriverCommon {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * This method is to wait for a list of elements appear on the page
 	 * 
@@ -128,16 +125,16 @@ public class WebDriverCommon {
 	 * @param timeout
 	 * 
 	 */
-	protected static List<WebElement> waitForElements(WebDriver driver, final By by, int timeout) {
+	protected static ArrayList<WebElement> waitForElements(WebDriver driver, final By by, int timeout) {
 
 		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
 
 		driver.manage().timeouts().setScriptTimeout(timeout, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
 
-		ExpectedCondition<List<WebElement>> expectation = new ExpectedCondition<List<WebElement>>() {
-			public List<WebElement> apply(WebDriver driver) {
-				return driver.findElements(by);
+		ExpectedCondition<ArrayList<WebElement>> expectation = new ExpectedCondition<ArrayList<WebElement>>() {
+			public ArrayList<WebElement> apply(WebDriver driver) {
+				return (ArrayList<WebElement>) driver.findElements(by);
 			}
 		};
 
@@ -293,7 +290,11 @@ public class WebDriverCommon {
 	 * @return WebElement
 	 */
 	protected WebElement getElement(Object obj) {
-		return getElement(obj, Integer.parseInt(PropertiesUtils.get("timeout")));
+		WebElement element = getElement(obj, Integer.parseInt(PropertiesUtils.get("timeout"))); 
+//		if (element == null) {
+//			logger.fatal("Object doesn't exist on the page. '" + element);
+//		}
+		return element;
 	}
 
 	/**
@@ -320,7 +321,7 @@ public class WebDriverCommon {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * This method is to get an element using By object with default timeout
 	 * 
@@ -338,7 +339,7 @@ public class WebDriverCommon {
 	 * @param by
 	 * @return List
 	 */
-	protected List<WebElement> getElements(By by) {
+	protected ArrayList<WebElement> getElements(By by) {
 		return waitForElements(driver, by, Integer.parseInt(PropertiesUtils.get("timeout")));
 	}
 
@@ -354,6 +355,10 @@ public class WebDriverCommon {
 		value = String.valueOf(value);
 		logger.info("Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");
 		String attributeActual = getAttribute(obj, attribute);
+		if (attribute.equals("text")) {
+			attributeActual = getText(obj);
+		}
+		
 		if (!(attributeActual.contains((String) value)) && throwError) { // ||
 																			// ((String)
 																			// value).contains(attributeActual)
@@ -375,6 +380,9 @@ public class WebDriverCommon {
 	 */
 	protected String getAttribute(Object obj, String attribute) {
 		WebElement element = getElement(obj);
+		if (element == null) {
+			return "";
+		}
 		return element.getAttribute(attribute);
 	}
 
