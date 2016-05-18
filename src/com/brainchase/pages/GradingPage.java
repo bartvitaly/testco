@@ -14,7 +14,6 @@ import com.brainchase.items.User;
  * 
  */
 public class GradingPage extends Menu {
-
 	final static Logger logger = Logger.getLogger(GradingPage.class);
 	String transactionId; 
 	
@@ -33,6 +32,7 @@ public class GradingPage extends Menu {
 	 */
 	public GradingPage(WebDriver driver) throws InterruptedException {
 		super(driver);
+		logger.info("Opened Grading page");
 		transactionId = getAttribute(transactionIdElement, "value");
 	}
 

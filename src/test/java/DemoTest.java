@@ -3,6 +3,7 @@ package test.java;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -41,17 +42,13 @@ public class DemoTest extends Initialize {
 	static ArrayList<User> users = new ArrayList<User>();
 	static ArrayList<Student> students = new ArrayList<Student>();
 	static ArrayList<User> allUsers = new ArrayList<User>();
-	
-	public ArrayList<ArrayList<String>> transactionsStudent = new ArrayList<ArrayList<String>>();
-	public ArrayList<ArrayList<String>> transactionsTeacher = new ArrayList<ArrayList<String>>();
-	public ArrayList<ArrayList<String>> transactionsSuperviser = new ArrayList<ArrayList<String>>();
 
 	@BeforeMethod(groups = { "demo" })
 	public void setUp() throws Exception {
 		TestNGReportAppender appender = new TestNGReportAppender();
 		m_assert = appender.getAssert();
 		BasicConfigurator.configure(appender);
-		logger.info("Started demo test for");
+		logger.debug("Started demo test for");
 		driver.get().get(PropertiesUtils.get("url"));
 	}
 
@@ -68,30 +65,48 @@ public class DemoTest extends Initialize {
 		return User.getUsers(users, PropertiesUtils.getInt("students_number"));
 	}
 
-//	@Test(groups = { "demo" }, dataProvider = "demoProvider")
-//	public void student(User user) throws Exception {
-//		final Student student = new Student(user.name, user.password, user.type);
-//		logger.info("Open login page, fill username and password and click login");
-//		DashboardPage dashboardPage = login(user);
-//
-//		logger.info("A student submits challenges");
-//		dashboardPage.submitChallenges(student);
-//
-//		logger.info("A student logs out");
-//		dashboardPage.logout();
-//		
-//		students.add(student);
-//	}
+	// @Test(groups = { "demo" }, dataProvider = "demoProvider")
+	// public void student(User user) throws Exception {
+	// final Student student = new Student(user.name, user.password, user.type);
+	// logger.info("Open login page, fill username and password and click
+	// login");
+	// DashboardPage dashboardPage = login(user);
+	//
+	// logger.info("A student submits challenges");
+	// dashboardPage.submitChallenges(student);
+	//
+	// logger.info("A student logs out");
+	// dashboardPage.logout();
+	//
+	// students.add(student);
+	// }
 
-	@Test(groups = { "demo" }) //, dependsOnMethods = "student"
+	@Test(groups = { "demo" }) // , dependsOnMethods = "student"
 	public void teacher() throws Exception {
-		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + "\\users.csv", "teacher").get(0)
-				.get(0);
+		// Get a teacher data from file
+		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + "\\users.csv", "teacher").get(0).get(0);
+
+		// Go to Dashboard page
 		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
-		transactionsTeacher = dashboardPage.grade(1);
+
+//		Create mock student transactions
+		HashMap<String, HashMap<String, String>> transactionsStudent = Transaction.getTransactionsHashMap();
+		transactionsStudent.get("engineering").put("testcoauto_student2", "bc573a158d2f4182.27928201");
 		
-		Transaction.writeTeacherTransactions(transactionsTeacher);
-		Transaction.mock(transactionsTeacher.get(0).get(0), transactionsTeacher.get(0).get(1), transactionsTeacher.get(0).get(2));
+		// Check transactions are shown on Dashboard
+		dashboardPage.checkAssignments(dashboardPage.allAssignments, transactionsStudent);
+
+		// Grade an assignment
+		dashboardPage.grade(teacher, 1);
+
+		// Write teacher transactions to a file
+		Transaction.writeTeacherTransactions(teacher.getTransactions());
+
+		// Compare students' and teacher's transactions
+		ArrayList<HashMap<String, HashMap<String, String>>> transactionsToCompare = new ArrayList<HashMap<String, HashMap<String, String>>>();
+		transactionsToCompare.add(transactionsStudent);
+		transactionsToCompare.add(teacher.getTransactions());
+		Transaction.compareTransactions(transactionsToCompare, Common.canonicalPath() + "\\TestResult.csv");
 	}
 
 	// @Test(groups = { "demo" }, dependsOnMethods = "teacher")
@@ -120,9 +135,8 @@ public class DemoTest extends Initialize {
 	 * @throws IOException
 	 */
 	public Object login(User user) throws InterruptedException {
-		logger.info("Open login page, fill username and password and click login");
 		LoginPage loginPage = new LoginPage(driver.get());
 		return loginPage.login(user);
 	}
-	
+
 }

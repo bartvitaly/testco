@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import com.brainchase.items.Challenge;
 import com.brainchase.items.Student;
 
 /**
@@ -13,7 +14,6 @@ import com.brainchase.items.Student;
  * 
  */
 public class ChallengePage extends Menu {
-
 	final static Logger logger = Logger.getLogger(ChallengePage.class);
 
 	private static By closeModal = By.cssSelector(".close-reveal-modal");
@@ -34,9 +34,11 @@ public class ChallengePage extends Menu {
 	 */
 	public ChallengePage(WebDriver driver) throws InterruptedException {
 		super(driver);
+		logger.info("Opened Challenge page.");
 
 		// Close modal dialog
 		if (present(closeModal)) {
+			logger.info("Closing modal dialog.");
 			click(closeModal);
 		}
 	}
@@ -47,30 +49,36 @@ public class ChallengePage extends Menu {
 	 * @param challenge
 	 * @throws InterruptedException
 	 */
-	public void submitChallenge(Student student, int i) throws InterruptedException {
+	public void submitChallenge(Student student, String challengeType) throws InterruptedException {
+		logger.info("Submitting challenge.");
+		
 		// Get transaction_id, if it is not exist then it will be assumed that a
 		// challenge is already submitted
+		Challenge challenge = student.challenges.get(challengeType);
+
 		if (!present(transactionIdElement)) {
-			logger.error("TransactionId is not present on the challenge page for student + " + student.name + " and challenge " + student.challenges.get(i));
+			logger.error("TransactionId is not present on the challenge page for student + " + student.name
+					+ " and challenge " + challengeType);
 		} else {
 			// Adding transaction_id to a Student object
-			student.challenges.get(i).transactionId = getAttribute(transactionIdElement, "value");
+			student.getTransactions().get(challengeType).put(student.name, getAttribute(transactionIdElement, "value"));
 
 			// Complete a challenge
-			switch (student.challenges.get(i).type) {
+			switch (challengeType) {
 			case "art":
-				type(externalLink, student.challenges.get(i).externalLink);
-				type(response, student.challenges.get(i).response);
+				type(externalLink, challenge.externalLink);
+				type(response, challenge.response);
 				break;
 			case "engineering":
-				type(externalLink, student.challenges.get(i).externalLink);
-				type(response, student.challenges.get(i).response);
+				type(externalLink, challenge.externalLink);
+				type(response, challenge.response);
 				break;
 			case "writing":
-				type(response, student.challenges.get(i).response);
+				type(response, challenge.response);
 				break;
 			}
 			click(submit);
+			checkAttribute(alert, "text", "Your submission has been saved.", true);
 		}
 
 		// Returning back to dashboard

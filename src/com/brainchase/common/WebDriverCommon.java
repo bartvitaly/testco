@@ -42,7 +42,7 @@ public class WebDriverCommon {
 	public WebDriverCommon(WebDriver driver) throws InterruptedException {
 		this.driver = driver;
 		this.action = new Actions(driver);
-		logger.info("Wait for page to load");
+		logger.debug("Wait for page to load");
 		waitForPageLoaded(driver);
 	}
 
@@ -54,7 +54,7 @@ public class WebDriverCommon {
 	 */
 	public static void takeScreenshot(WebDriver driver) {
 		String fileName = "\\test-output\\screenshot.png";
-		logger.info("Taking screenshot.");
+		logger.debug("Taking screenshot.");
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(scrFile, new File(Common.canonicalPath() + fileName));
@@ -179,7 +179,7 @@ public class WebDriverCommon {
 	 * @param obj
 	 */
 	protected void click(Object obj) {
-		logger.info("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
 			action.moveToElement(element).build().perform();
@@ -198,7 +198,7 @@ public class WebDriverCommon {
 	 */
 	protected void click_wait(Object obj) {
 		click(obj);
-		logger.info("Waiting for page to load '" + driver.getCurrentUrl() + "'");
+		logger.debug("Waiting for page to load '" + driver.getCurrentUrl() + "'");
 		try {
 			waitForPageLoaded(driver);
 		} catch (Exception e) {
@@ -214,7 +214,7 @@ public class WebDriverCommon {
 	 */
 	protected void type(Object obj, Object text) {
 		text = String.valueOf(text);
-		logger.info(
+		logger.debug(
 				"Filling a text '" + text + "' into the field '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
@@ -234,7 +234,7 @@ public class WebDriverCommon {
 	 * @param text
 	 */
 	protected void select(Object obj, String text) {
-		logger.info("Selecting a value '" + text + "' from select field '" + obj + "' on page '"
+		logger.debug("Selecting a value '" + text + "' from select field '" + obj + "' on page '"
 				+ driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		Select selectBox = new Select(element);
@@ -248,7 +248,7 @@ public class WebDriverCommon {
 	 * @return WebElement
 	 */
 	protected String getText(Object obj) {
-		logger.info("Getting text from element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		logger.debug("Getting text from element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		return element.getText().toString();
 	}
@@ -275,7 +275,7 @@ public class WebDriverCommon {
 	 * @return WebElement
 	 */
 	protected WebElement getElement(Object obj, int timeout) {
-		logger.info("Getting element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		logger.debug("Getting element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		if (obj.getClass().getName().contains(By.class.getName())) {
 			return waitForElement(driver, (By) obj, timeout);
 		}
@@ -305,7 +305,7 @@ public class WebDriverCommon {
 	 * @return WebElement
 	 */
 	protected WebElement getElement(By by, int timeout) {
-		logger.info("Getting element '" + by + "' on page '" + driver.getCurrentUrl() + "'");
+		logger.debug("Getting element '" + by + "' on page '" + driver.getCurrentUrl() + "'");
 		return waitForElement(driver, by, timeout);
 	}
 
@@ -353,7 +353,7 @@ public class WebDriverCommon {
 	 */
 	protected boolean checkAttribute(Object obj, String attribute, Object value, boolean throwError) {
 		value = String.valueOf(value);
-		logger.info("Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");
+		logger.debug("Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");
 		String attributeActual = getAttribute(obj, attribute);
 		if (attribute.equals("text")) {
 			attributeActual = getText(obj);

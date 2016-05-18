@@ -5,7 +5,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import com.brainchase.common.WebDriverCommon;
-import com.brainchase.items.User;
 
 /**
  * This class describes a menu of the web site
@@ -15,10 +14,13 @@ import com.brainchase.items.User;
  */
 public class Menu extends WebDriverCommon {
 
-	private final WebDriver driver;
+	protected final WebDriver driver;
 	final static Logger logger = Logger.getLogger(Menu.class);
 
-	By logout = By.cssSelector("[href*='logout']");
+	static By logout = By.cssSelector("[href*='logout']");
+
+	// Alert box
+	static By alert = By.cssSelector(".alert-box");
 
 	/**
 	 * This is constructor that sets a web driver for the page object

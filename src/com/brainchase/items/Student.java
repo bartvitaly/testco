@@ -1,10 +1,8 @@
 package com.brainchase.items;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import com.brainchase.common.Common;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -15,9 +13,7 @@ import com.brainchase.common.Common;
  */
 public class Student extends User {
 
-	public ArrayList<Challenge> challenges = new ArrayList<Challenge>();
-//	public ArrayList<String> challengesProgress = new ArrayList<String>();
-	public ArrayList<ArrayList<String>> transactions = new ArrayList<ArrayList<String>>();
+	public HashMap<String, Challenge> challenges = new HashMap<String, Challenge>();
 	
 	/**
 	 * This is constructor of the class
@@ -30,9 +26,11 @@ public class Student extends User {
 	 */
 	public Student(String name, String password, String type) throws IOException {
 		super(name, password, type);
-		this.challenges.add(new Challenge("art"));
-//		this.challenges.add(new Challenge("engineering"));
-		this.challenges.add(new Challenge("writing"));
+		for (Map.Entry<String, HashMap<String, String>> entry : super.getTransactions().entrySet())
+		{
+			this.challenges.put(entry.getKey(), new Challenge(entry.getKey()));
+		}
+//		this.challenges.add(new Challenge("writing"));
 		
 //		this.challenges = CsvFileReader.readChallengesFile(Common.canonicalPath() + "\\challenges.csv", name);
 	}

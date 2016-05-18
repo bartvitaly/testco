@@ -2,6 +2,7 @@ package com.brainchase.items;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * 
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 public class User {
 
 	public String name, password, type;
+	private HashMap<String, HashMap<String, String>> transactions = Transaction.getTransactionsHashMap();
 	
 	/**
 	 * This is constructor of the class
@@ -48,6 +50,14 @@ public class User {
 		}
 		
 		return dataProviderArray;
+	}
+
+	public HashMap<String, HashMap<String, String>> getTransactions() {
+		return transactions;
+	}
+
+	public void setTransactions(HashMap<String, HashMap<String, String>> transactions) {
+		this.transactions = transactions;
 	}
 	
 	

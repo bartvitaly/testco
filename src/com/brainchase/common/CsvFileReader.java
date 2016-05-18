@@ -10,7 +10,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import com.brainchase.items.Challenge;
-import com.brainchase.items.Student;
 import com.brainchase.items.User;
 
 /**
@@ -21,8 +20,8 @@ public class CsvFileReader {
 
 	// CSV file header
 	private static final String[] USERS_HEADER_MAPPING = { "username", "password", "type" };
-	private static final String[] CHALLENGES_HEADER_MAPPING = { "username", "art", "bonus", "engineering", "math",
-			"reading", "writing" };
+	private static final String[] CHALLENGES_HEADER_MAPPING = { "art", "bonus", "engineering", "math", "reading",
+			"writing" };
 
 	// Common attributes
 	private static final String USERNAME = "username";
@@ -92,7 +91,7 @@ public class CsvFileReader {
 
 	}
 
-	public static ArrayList<Challenge> readChallengesFile(String fileName, String student) {
+	public static ArrayList<Challenge> readChallengesFile(String fileName) {
 
 		FileReader fileReader = null;
 
@@ -116,25 +115,23 @@ public class CsvFileReader {
 			// the header
 			for (int i = 1; i < csvRecords.size(); i++) {
 				Object record = csvRecords.get(i);
-				if (((CSVRecord) record).get(USERNAME).equals(student)) {
-					if (((CSVRecord) record).get(ART).equals("1")) {
-						challenges.add(new Challenge("art"));
-					}
-					if (((CSVRecord) record).get(BONUS).equals("1")) {
-						challenges.add(new Challenge("bonus"));
-					}
-					if (((CSVRecord) record).get(ENGINEERING).equals("1")) {
-						challenges.add(new Challenge("engineering"));
-					}
-					if (((CSVRecord) record).get(MATH).equals("1")) {
-						challenges.add(new Challenge("math"));
-					}
-					if (((CSVRecord) record).get(READING).equals("1")) {
-						challenges.add(new Challenge("reading"));
-					}
-					if (((CSVRecord) record).get(WRITING).equals("1")) {
-						challenges.add(new Challenge("writing"));
-					}
+				if (((CSVRecord) record).get(ART).equals("1")) {
+					challenges.add(new Challenge("art"));
+				}
+				if (((CSVRecord) record).get(BONUS).equals("1")) {
+					challenges.add(new Challenge("bonus"));
+				}
+				if (((CSVRecord) record).get(ENGINEERING).equals("1")) {
+					challenges.add(new Challenge("engineering"));
+				}
+				if (((CSVRecord) record).get(MATH).equals("1")) {
+					challenges.add(new Challenge("math"));
+				}
+				if (((CSVRecord) record).get(READING).equals("1")) {
+					challenges.add(new Challenge("reading"));
+				}
+				if (((CSVRecord) record).get(WRITING).equals("1")) {
+					challenges.add(new Challenge("writing"));
 				}
 			}
 

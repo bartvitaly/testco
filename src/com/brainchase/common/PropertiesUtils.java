@@ -31,7 +31,7 @@ public class PropertiesUtils {
 			e.printStackTrace();
 		}
 
-		logger.info(
+		logger.debug(
 				"Property '" + key + "' with value '" + result + "' is retreived from file '" + TEST_PROPERTIES + "'");
 		return result;
 	}

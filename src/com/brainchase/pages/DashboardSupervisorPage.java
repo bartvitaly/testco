@@ -16,8 +16,6 @@ import org.openqa.selenium.WebElement;
  * 
  */
 public class DashboardSupervisorPage extends Menu {
-
-	private final WebDriver driver;
 	final static Logger logger = Logger.getLogger(DashboardSupervisorPage.class);
 
 	HashMap<String, ArrayList<String>> nonWritingAssignments = new HashMap<String, ArrayList<String>>();
@@ -38,7 +36,7 @@ public class DashboardSupervisorPage extends Menu {
 	 */
 	public DashboardSupervisorPage(WebDriver driver) throws InterruptedException {
 		super(driver);
-		this.driver = driver;
+		logger.info("Opened Supervisor's Dashboard page");
 	}
 
 	/**

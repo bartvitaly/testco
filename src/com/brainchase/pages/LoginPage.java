@@ -14,8 +14,6 @@ import com.brainchase.items.User;
  * 
  */
 public class LoginPage extends Menu {
-
-	private final WebDriver driver;
 	final static Logger logger = Logger.getLogger(LoginPage.class);
 
 	private static By username = By.cssSelector("[id=edit-name]");
@@ -30,8 +28,8 @@ public class LoginPage extends Menu {
 	 */
 	public LoginPage(WebDriver driver) throws InterruptedException {
 		super(driver);
-		this.driver = driver;
-
+		logger.info("Opened Login page.");
+		
 		if (present(logout)) {
 			click(logout);
 		}
@@ -45,6 +43,7 @@ public class LoginPage extends Menu {
 	 * @throws InterruptedException
 	 */
 	public Object login(User user) throws InterruptedException {
+		logger.info("Fill username '" + user.name + "' and password '" + user.password + "' and click login");
 		type(username, user.name);
 		type(password, user.password);
 		click(submit);

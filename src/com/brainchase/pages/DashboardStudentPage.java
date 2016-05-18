@@ -3,6 +3,8 @@ package com.brainchase.pages;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -23,8 +25,6 @@ import com.brainchase.items.User;
  * 
  */
 public class DashboardStudentPage extends Menu {
-
-	private final WebDriver driver;
 	final static Logger logger = Logger.getLogger(DashboardStudentPage.class);
 	static String CHALLENGE_SUBMITTED = "challenge-status-2";
 
@@ -49,7 +49,7 @@ public class DashboardStudentPage extends Menu {
 	 */
 	public DashboardStudentPage(WebDriver driver) throws InterruptedException {
 		super(driver);
-		this.driver = driver;
+		logger.info("Opened Student's Dashboard page");
 
 		if (present(welcomePopup)) {
 			click(welcomePopup);
@@ -59,21 +59,21 @@ public class DashboardStudentPage extends Menu {
 	/**
 	 * This method opens a challenge
 	 * 
-	 * @param challenge
+	 * @param challengeType
 	 * @return Challenge
 	 * @throws InterruptedException
 	 */
-	public ChallengePage openChallenge(Challenge challenge) throws InterruptedException {
+	public ChallengePage openChallenge(String challengeType) throws InterruptedException {
 		// If Challenges are not enabled click introductory video and close it
 		// then
 		if (getAttribute(engineeringChallenge, "style").contains("block")) {
 			click(introductory);
 			click(videoClose);
-			driver.navigate().refresh();
+			super.driver.navigate().refresh();
 		}
 
 		// Open a challenge
-		click(getChallengeElement(challenge.type));
+		click(getChallengeElement(challengeType));
 
 		return new ChallengePage(driver);
 	}
@@ -86,22 +86,15 @@ public class DashboardStudentPage extends Menu {
 	 * @throws IOException
 	 */
 	public void submitChallenges(Student student) throws InterruptedException, IOException {
-		ArrayList<String> transactions = new ArrayList<String>();
-		for (int i = 0; i < student.challenges.size(); i++) {
-			if (getAttribute(getChallengeElement(student.challenges.get(i).type), "class")
+		for (Map.Entry<String, HashMap<String, String>> transactions : student.getTransactions().entrySet())
+		{
+			String challengeType = transactions.getKey();
+			if (getAttribute(getChallengeElement(challengeType), "class")
 					.equals(CHALLENGE_SUBMITTED)) {
-//				student.challengesProgress.add(
-//						student.name + "," + student.challenges.get(i).type + ",the challenge is already submitted");
-				transactions.add(student.challenges.get(i).type);
-				student.transactions.add(transactions);
+				student.getTransactions().get(challengeType).put(student.name, "");
 			} else {
-				ChallengePage challengePage = openChallenge(student.challenges.get(i));
-				challengePage.submitChallenge(student, i);
-//				student.challengesProgress.add(student.name + "," + student.challenges.get(i).type + ","
-//						+ student.challenges.get(i).transactionId);
-				transactions.add(student.challenges.get(i).type);
-				transactions.add(student.challenges.get(i).transactionId);
-				student.transactions.add(transactions);
+				ChallengePage challengePage = openChallenge(challengeType);
+				challengePage.submitChallenge(student, challengeType);
 			}
 		}
 	}
