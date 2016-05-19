@@ -8,8 +8,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 import com.brainchase.common.Common;
 import com.brainchase.common.CsvFileReader;
+import com.brainchase.pages.DashboardTeacherPage;
 
 /**
  * 
@@ -17,8 +20,10 @@ import com.brainchase.common.CsvFileReader;
  *
  */
 public class Transaction {
-
+	final static Logger logger = Logger.getLogger(DashboardTeacherPage.class);
 	String studentName, challengeType, transactionid;
+	public static ArrayList<Challenge> challenges = CsvFileReader
+			.readChallengesFile(Common.canonicalPath() + "\\challenges.csv");
 
 	/**
 	 * This is constructor of the class
@@ -31,15 +36,56 @@ public class Transaction {
 	}
 
 	/**
+	 * This method is to add a new transaction into existing HashMap
+	 * 
+	 * @param transactionsOld
+	 * @param transactionNew
+	 * @return
+	 */
+	public static HashMap<String, HashMap<String, String>> addTransactions(
+			HashMap<String, HashMap<String, String>> transactionsOld,
+			HashMap<String, HashMap<String, String>> transactionsNew) {
+
+		// Iterate over challenges
+		Iterator<Entry<String, HashMap<String, String>>> itTypes = transactionsNew.entrySet().iterator();
+		while (itTypes.hasNext()) {
+			Map.Entry<String, HashMap<String, String>> types = (Map.Entry<String, HashMap<String, String>>) itTypes
+					.next();
+
+			// Iterate over students
+			Iterator<Entry<String, String>> itStudents = types.getValue().entrySet().iterator();
+			while (itStudents.hasNext()) {
+				Map.Entry<String, String> students = (Map.Entry<String, String>) itStudents.next();
+				transactionsOld.get(types.getKey()).put(students.getKey(), students.getValue());
+			}
+		}
+
+		return transactionsOld;
+	}
+
+	/**
 	 * This method is to create transactions HashMap
 	 * 
 	 * @param transactions
 	 */
 	public static HashMap<String, HashMap<String, String>> getTransactionsHashMap() {
 		HashMap<String, HashMap<String, String>> transactions = new HashMap<String, HashMap<String, String>>();
-		ArrayList<Challenge> challenges = CsvFileReader.readChallengesFile(Common.canonicalPath() + "\\challenges.csv");
 		for (int i = 0; i < challenges.size(); i++) {
 			transactions.put(challenges.get(i).type, new HashMap<String, String>());
+		}
+
+		return transactions;
+	}
+
+	/**
+	 * This method is to create transactions HashMap
+	 * 
+	 * @param transactions
+	 */
+	public static HashMap<String, HashMap<String, String>> getAllTransactionsHashMap() {
+		HashMap<String, HashMap<String, String>> transactions = new HashMap<String, HashMap<String, String>>();
+		for (int i = 0; i < CsvFileReader.CHALLENGES_ACTUAL.length; i++) {
+			transactions.put(CsvFileReader.CHALLENGES_ACTUAL[i], new HashMap<String, String>());
 		}
 
 		return transactions;
@@ -85,8 +131,10 @@ public class Transaction {
 	/**
 	 * This method is to create transactions mock
 	 * 
-	 * @param transactions
-	 * @throws IOException
+	 * @param studentName
+	 * @param challengeType
+	 * @param transactionId
+	 * 
 	 */
 	public static HashMap<String, HashMap<String, String>> mock(String studentName, String challengeType,
 			String transactionId) {
@@ -97,79 +145,126 @@ public class Transaction {
 		return transactions;
 	}
 
-	public static void compareTransactions(ArrayList<HashMap<String, HashMap<String, String>>> transactions,
-			String path) throws IOException {
-
-		String transaction_id3 = "";
-		if (transactions.size() > 2) {
-			transaction_id3 = ",transaction_id3";
-		}
-		String toPrint = "student_name,challenge_type,transaction_id1,transaction_id2" + transaction_id3
-				+ ",comparison_result";
-
+	/**
+	 * This method is to remove empty challenges in transactions
+	 *
+	 * @param transactions
+	 * @param dashboard
+	 */
+	public static void removeEmpty(HashMap<String, HashMap<String, String>> transaction) {
 		// Iterate over challenges' types
-		Iterator<Entry<String, HashMap<String, String>>> itTypes = transactions.get(0).entrySet().iterator();
+		Iterator<Entry<String, HashMap<String, String>>> itTypes = transaction.entrySet().iterator();
 		while (itTypes.hasNext()) {
 			Map.Entry<String, HashMap<String, String>> types = (Map.Entry<String, HashMap<String, String>>) itTypes
 					.next();
-
-			toPrint = toPrint + "\r\n";
-			// Iterate over students
-			Iterator<Entry<String, String>> itStudents = types.getValue().entrySet().iterator();
-			while (itStudents.hasNext()) {
-				Map.Entry<String, String> students = (Map.Entry<String, String>) itStudents.next();
-
-				// Comparison
-				Boolean result = false;
-
-				String transactionId1 = students.getValue();
-				String transactionId2 = transactions.get(1).get(types.getKey()).get(students.getKey());
-				if (transactions.size() > 2) {
-					String transactionId3 = transactions.get(2).get(types.getKey()).get(students.getKey());
-					if (transactionId1.equals(transactionId2) && transactionId1.equals(transactionId2)) {
-						result = true;
-					}
-					toPrint = toPrint + types.getKey() + "," + students.getKey() + "," + transactionId1 + ","
-							+ transactionId2 + "," + transactionId3 + "," + result.toString();
-				} else {
-					toPrint = "student_name,challenge_type,transaction_id1,transaction_id2,comparison_result";
-					if (transactionId1.equals(transactionId2)) {
-						result = true;
-					}
-					toPrint = toPrint + types.getKey() + "," + students.getKey() + "," + transactionId1 + ","
-							+ transactionId2 + "," + result.toString();
-
-				}
-				itStudents.remove();
+			if (types.getValue().isEmpty()) {
+				itTypes.remove();
 			}
-			itTypes.remove();
+		}
+	}
+
+	/**
+	 * This method is to compare transaction vs dashboard
+	 * 
+	 * @param transaction
+	 * @param transaction2
+	 */
+	public static ArrayList<ArrayList<String>> compareTransactions(HashMap<String, HashMap<String, String>> transaction,
+			HashMap<String, HashMap<String, String>> transaction2, Boolean transactions) {
+
+		logger.info("Comparing transactions:\r\n" + transactionsToString(transactionsToArrayList(transaction))
+				+ "\r\n" + transactionsToString(transactionsToArrayList(transaction2)));
+
+		removeEmpty(transaction);
+		removeEmpty(transaction2);
+		ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
+
+		// Iterate over challenges in student HashMap
+		for (String challenge : transaction.keySet()) {
+
+			// Comparison
+			Boolean result = false;
+			for (String student : transaction.get(challenge).keySet()) {
+				ArrayList<String> row = new ArrayList<String>();
+				if (transactions) {
+					if (transaction2.containsKey(challenge) && transaction2.get(challenge).get(student).equals(transaction.get(challenge).get(student))) {
+						result = true;
+					}
+				} else {
+					if (transaction2.containsKey(challenge) && !transaction2.get(challenge).isEmpty() && transaction2.get(challenge).get(student) != null) {
+						result = true;
+					}
+				}
+				row.add(challenge);
+				row.add(student);
+				if (transactions) {
+					if (!transaction.containsKey(challenge) ||transaction.get(challenge).isEmpty()) {
+						row.add("");
+					} else {
+						row.add(transaction.get(challenge).get(student));
+					}
+					if (!transaction2.containsKey(challenge) || transaction2.get(challenge).isEmpty()) {
+						row.add("");
+					} else {
+						row.add(transaction2.get(challenge).get(student));
+					}
+				}
+				row.add(result.toString());
+				table.add(row);
+			}
 		}
 
-		Common.writeToFile(path, toPrint);
+		// Iterate over teacher's dashboard
+		for (String challenge : transaction2.keySet()) {
+			// Checking if element exist
+			for (String student : transaction2.get(challenge).keySet()) {
+				ArrayList<String> row = new ArrayList<String>();
+				if (!transaction.get(challenge).containsKey(student)) {
+					row.add(challenge);
+					row.add(student);
+					if (transactions) {
+						if (transaction.get(challenge).isEmpty()) {
+							row.add("");
+						} else {
+							row.add(transaction.get(challenge).get(student));
+						}
+						if (transaction2.get(challenge).isEmpty()) {
+							row.add("");
+						} else {
+							row.add(transaction2.get(challenge).get(student));
+						}
+					}
+					row.add("false");
+					table.add(row);
+				}
+			}
+		}
+
+		return table;
 	}
 
 	/**
 	 * This method is used to write transaction ids to file
 	 * 
 	 * @param user
-	 * @return DashboardPage
 	 * @throws IOException
 	 */
 	public static void writeTransactions(String path, HashMap<String, HashMap<String, String>> transactions)
 			throws IOException {
-		Common.writeToFile(path, transactionsToString(transactions));
+		Common.writeToFile(path, transactionsToString(transactionsToArrayList(transactions)));
 	}
 
 	/**
-	 * This method is used to write transaction ids to file
+	 * This method is convert transactions Hash into and ArrayList
 	 * 
-	 * @param user
-	 * @return DashboardPage
+	 * @param transactions
+	 * @return ArrayList<ArrayList<String>>
 	 */
-	public static String transactionsToString(HashMap<String, HashMap<String, String>> transactions) {
-		String toPrint = "student_name,challenge_type,transaction_id";
+	public static ArrayList<ArrayList<String>> transactionsToArrayList(
+			HashMap<String, HashMap<String, String>> transactions) {
+		ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
 
-		// Iterate over challenges' types
+		// Iterate over challenges types
 		Iterator<Entry<String, HashMap<String, String>>> itTypes = transactions.entrySet().iterator();
 		while (itTypes.hasNext()) {
 			Map.Entry<String, HashMap<String, String>> types = (Map.Entry<String, HashMap<String, String>>) itTypes
@@ -178,12 +273,35 @@ public class Transaction {
 			// Iterate over students
 			Iterator<Entry<String, String>> itStudents = types.getValue().entrySet().iterator();
 			while (itStudents.hasNext()) {
-				toPrint = toPrint + "\r\n";
+				ArrayList<String> row = new ArrayList<String>();
 				Map.Entry<String, String> students = (Map.Entry<String, String>) itStudents.next();
-				toPrint = toPrint + types.getKey() + "," + students.getKey() + "," + students.getValue();
-				itStudents.remove();
+				row.add(types.getKey());
+				row.add(students.getKey());
+				row.add(students.getValue());
+				table.add(row);
 			}
-			itTypes.remove();
+		}
+
+		return table;
+	}
+
+	/**
+	 * This method is used to write transaction ids to file
+	 * 
+	 * @param transactions
+	 * @return String
+	 */
+	public static String transactionsToString(ArrayList<ArrayList<String>> transactions) {
+		String toPrint = "student_name,challenge_type,transaction_id\r\n";
+		for (int i = 0; i < transactions.size(); i++) {
+			ArrayList<String> row = transactions.get(i);
+			for (int j = 0; j < row.size(); j++) {
+				toPrint = toPrint + row.get(j);
+				if (j < row.size() - 1) {
+					toPrint = toPrint + ",";
+				}
+			}
+			toPrint = toPrint + "\r\n";
 		}
 
 		return toPrint;

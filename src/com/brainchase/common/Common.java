@@ -152,11 +152,7 @@ public class Common {
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
 			writer.write(text);
-//			Files.write(Paths.get(path), text.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException ex) {
-//			logger.info("Can't write to a file '" + path + "', trying again...");
-//			Files.write(Paths.get(path), System.getProperty("line.separator").getBytes(), StandardOpenOption.APPEND);
-//			Files.write(Paths.get(path), text.getBytes(), StandardOpenOption.APPEND);
 		} finally {
 			try {
 				 writer.close();

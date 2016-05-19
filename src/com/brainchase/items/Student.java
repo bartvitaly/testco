@@ -14,25 +14,22 @@ import java.util.Map;
 public class Student extends User {
 
 	public HashMap<String, Challenge> challenges = new HashMap<String, Challenge>();
-	
+
 	/**
 	 * This is constructor of the class
 	 * 
+	 * @param login
 	 * @param name
 	 * @param password
 	 * @param type
-	 * @throws IOException 
+	 * @throws IOException
 	 * 
 	 */
-	public Student(String name, String password, String type) throws IOException {
-		super(name, password, type);
-		for (Map.Entry<String, HashMap<String, String>> entry : super.getTransactions().entrySet())
-		{
+	public Student(String login, String name, String password, String type) throws IOException {
+		super(login, name, password, type);
+		for (Map.Entry<String, HashMap<String, String>> entry : super.getTransactions().entrySet()) {
 			this.challenges.put(entry.getKey(), new Challenge(entry.getKey()));
 		}
-//		this.challenges.add(new Challenge("writing"));
-		
-//		this.challenges = CsvFileReader.readChallengesFile(Common.canonicalPath() + "\\challenges.csv", name);
 	}
-	
+
 }

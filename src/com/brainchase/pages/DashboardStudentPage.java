@@ -26,7 +26,10 @@ import com.brainchase.items.User;
  */
 public class DashboardStudentPage extends Menu {
 	final static Logger logger = Logger.getLogger(DashboardStudentPage.class);
+
 	static String CHALLENGE_SUBMITTED = "challenge-status-2";
+	static String CHALLENGE_GRADED = "challenge-status-1";
+	static String CHALLENGE_ACTIVE = "challenge-status-0";
 
 	static By welcomePopup = By.cssSelector("[style*='visible'] .joyride-close-tip");
 
@@ -34,12 +37,12 @@ public class DashboardStudentPage extends Menu {
 	private static By videoClose = By.cssSelector(".fancybox-close");
 	private static By weekContainer = By.cssSelector(".week-container");
 
-	private static By engineeringChallenge = By.cssSelector("[style*='engineering']");
-	private static By mathChallenge = By.cssSelector("[style*='math']");
-	private static By readingChallenge = By.cssSelector("[style*='reading']");
-	private static By writingChallenge = By.cssSelector("[style*='writing']");
-	private static By artChallenge = By.cssSelector("[style*='art']");
-	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
+	private static By engineeringChallenge = By.cssSelector("[style*='engineering'] span");
+	private static By mathChallenge = By.cssSelector("[style*='math'] span");
+	private static By readingChallenge = By.cssSelector("[style*='reading'] span");
+	private static By writingChallenge = By.cssSelector("[style*='writing'] span");
+	private static By artChallenge = By.cssSelector("[style*='art'] span");
+	private static By bonusChallenge = By.cssSelector("[style*='bonus'] span");
 
 	/**
 	 * This is constructor that sets a web driver for the page object
@@ -66,7 +69,8 @@ public class DashboardStudentPage extends Menu {
 	public ChallengePage openChallenge(String challengeType) throws InterruptedException {
 		// If Challenges are not enabled click introductory video and close it
 		// then
-		if (getAttribute(engineeringChallenge, "style").contains("block")) {
+		String challengeStatus = getAttribute(engineeringChallenge, "class");
+		if (challengeStatus.equals(CHALLENGE_ACTIVE)) {
 			click(introductory);
 			click(videoClose);
 			super.driver.navigate().refresh();
@@ -86,12 +90,11 @@ public class DashboardStudentPage extends Menu {
 	 * @throws IOException
 	 */
 	public void submitChallenges(Student student) throws InterruptedException, IOException {
-		for (Map.Entry<String, HashMap<String, String>> transactions : student.getTransactions().entrySet())
-		{
+		for (Map.Entry<String, HashMap<String, String>> transactions : student.getTransactions().entrySet()) {
 			String challengeType = transactions.getKey();
-			if (getAttribute(getChallengeElement(challengeType), "class")
-					.equals(CHALLENGE_SUBMITTED)) {
-				student.getTransactions().get(challengeType).put(student.name, "");
+			String challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
+			if (challengeStatus.equals(CHALLENGE_SUBMITTED) || challengeStatus.equals(CHALLENGE_GRADED)) {
+//				student.getTransactions().get(challengeType).put(student.name, "");
 			} else {
 				ChallengePage challengePage = openChallenge(challengeType);
 				challengePage.submitChallenge(student, challengeType);

@@ -290,10 +290,7 @@ public class WebDriverCommon {
 	 * @return WebElement
 	 */
 	protected WebElement getElement(Object obj) {
-		WebElement element = getElement(obj, Integer.parseInt(PropertiesUtils.get("timeout"))); 
-//		if (element == null) {
-//			logger.fatal("Object doesn't exist on the page. '" + element);
-//		}
+		WebElement element = getElement(obj, Integer.parseInt(PropertiesUtils.get("timeout")));
 		return element;
 	}
 
@@ -353,12 +350,13 @@ public class WebDriverCommon {
 	 */
 	protected boolean checkAttribute(Object obj, String attribute, Object value, boolean throwError) {
 		value = String.valueOf(value);
-		logger.debug("Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");
+		logger.debug(
+				"Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");
 		String attributeActual = getAttribute(obj, attribute);
 		if (attribute.equals("text")) {
 			attributeActual = getText(obj);
 		}
-		
+
 		if (!(attributeActual.contains((String) value)) && throwError) { // ||
 																			// ((String)
 																			// value).contains(attributeActual)
@@ -366,7 +364,7 @@ public class WebDriverCommon {
 					+ "', actual is '" + attributeActual + "' for an object '" + obj + "'");
 			return false;
 		}
-		logger.info("Verify verification of attribute '" + attribute + "' passed. Expected value '" + value
+		logger.info("Verification of an attribute '" + attribute + "' passed. Expected value '" + value
 				+ "', actual is '" + attributeActual + "' for an object '" + obj + "'");
 		return true;
 	}
@@ -383,6 +381,10 @@ public class WebDriverCommon {
 		if (element == null) {
 			return "";
 		}
+		if (attribute.equals("text")) {
+			return getText(element);
+		}
+
 		return element.getAttribute(attribute);
 	}
 

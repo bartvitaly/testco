@@ -39,12 +39,12 @@ public class LoginPage extends Menu {
 	 * This method logs in a user
 	 * 
 	 * @param User
-	 * @return
+	 * @return Page Object
 	 * @throws InterruptedException
 	 */
 	public Object login(User user) throws InterruptedException {
 		logger.info("Fill username '" + user.name + "' and password '" + user.password + "' and click login");
-		type(username, user.name);
+		type(username, user.login);
 		type(password, user.password);
 		click(submit);
 		

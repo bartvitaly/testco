@@ -19,11 +19,13 @@ import com.brainchase.items.User;
 public class CsvFileReader {
 
 	// CSV file header
-	private static final String[] USERS_HEADER_MAPPING = { "username", "password", "type" };
-	private static final String[] CHALLENGES_HEADER_MAPPING = { "art", "bonus", "engineering", "math", "reading",
+	private static final String[] USERS_HEADER_MAPPING = { "login", "username", "password", "type" };
+	public static final String[] CHALLENGES_HEADER_MAPPING = { "art", "bonus", "engineering", "math", "reading",
 			"writing" };
+	public static final String[] CHALLENGES_ACTUAL = { "art", "engineering", "writing" };
 
 	// Common attributes
+	private static final String LOGIN = "login";
 	private static final String USERNAME = "username";
 
 	// Users' attributes
@@ -64,8 +66,8 @@ public class CsvFileReader {
 			for (int i = 1; i < csvRecords.size(); i++) {
 				Object record = csvRecords.get(i);
 				// Create a new student object and fill his data
-				User user = new User(((CSVRecord) record).get(USERNAME), ((CSVRecord) record).get(PASSWORD),
-						((CSVRecord) record).get(TYPE));
+				User user = new User(((CSVRecord) record).get(LOGIN), ((CSVRecord) record).get(USERNAME),
+						((CSVRecord) record).get(PASSWORD), ((CSVRecord) record).get(TYPE));
 				if (user.type.equals(type)) {
 					users.add(user);
 				}

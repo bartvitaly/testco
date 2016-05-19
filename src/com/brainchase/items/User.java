@@ -13,18 +13,20 @@ import java.util.HashMap;
  */
 public class User {
 
-	public String name, password, type;
+	public String login, name, password, type;
 	private HashMap<String, HashMap<String, String>> transactions = Transaction.getTransactionsHashMap();
-	
+
 	/**
 	 * This is constructor of the class
 	 * 
+	 * @param login
 	 * @param name
 	 * @param password
 	 * @param type
 	 * 
 	 */
-	public User(String name, String password, String type) {
+	public User(String login, String name, String password, String type) {
+		this.login = login;
 		this.name = name;
 		this.password = password;
 		this.type = type;
@@ -48,7 +50,7 @@ public class User {
 			dataProviderArray[dataProviderIterator][0] = users.get(usersIterator);
 			usersIterator++;
 		}
-		
+
 		return dataProviderArray;
 	}
 
@@ -59,6 +61,5 @@ public class User {
 	public void setTransactions(HashMap<String, HashMap<String, String>> transactions) {
 		this.transactions = transactions;
 	}
-	
-	
+
 }

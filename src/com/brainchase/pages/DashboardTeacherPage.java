@@ -28,14 +28,15 @@ import com.brainchase.items.User;
 public class DashboardTeacherPage extends Menu {
 	final static Logger logger = Logger.getLogger(DashboardTeacherPage.class);
 
-	public HashMap<String, HashMap<String, String>> nonWritingAssignments = new HashMap<String, HashMap<String, String>>();
-	public HashMap<String, HashMap<String, String>> writingAssignments = new HashMap<String, HashMap<String, String>>();
-	public HashMap<String, HashMap<String, String>> allAssignments = new HashMap<String, HashMap<String, String>>();
+	public HashMap<String, HashMap<String, String>> nonWritingAssignments = Transaction.getAllTransactionsHashMap();
+	public HashMap<String, HashMap<String, String>> writingAssignments = Transaction.getAllTransactionsHashMap();
+	public HashMap<String, HashMap<String, String>> allAssignments = Transaction.getAllTransactionsHashMap();
 
 	// Grade controls
 	static By gradeIt = By.cssSelector("[href*='grading']");
 	static By studentName = By.cssSelector(".small-8 .small-12 tbody td:nth-child(1)");
 	static By challengeType = By.cssSelector(".small-8 .small-12 tbody td:nth-child(2)");
+	static By date = By.cssSelector(".small-8 .small-12 tbody td:nth-child(3)");
 
 	// Miscellaneous and writing challenges info
 	static By miscellaneousInfo = By.cssSelector("[id=bc-caching-teacher-assignment-form] p:nth-of-type(1)");
@@ -60,8 +61,16 @@ public class DashboardTeacherPage extends Menu {
 		logger.info("Opened Teacher's Dashboard page");
 
 		// Getting all the assignments
-		nonWritingAssignments = putAssignmentsInList(getElements(nonWriting));
-		writingAssignments    = putAssignmentsInList(getElements(writing));
+		if (present(nonWriting)) {
+			nonWritingAssignments = putAssignmentsInList(getElements(nonWriting));
+		}
+		nonWritingAssignments.remove("writing");
+
+		if (present(writing)) {
+			writingAssignments = putAssignmentsInList(getElements(writing));
+		}
+		writingAssignments.remove("art");
+		writingAssignments.remove("engineering");
 
 		allAssignments.putAll(nonWritingAssignments);
 		allAssignments.putAll(writingAssignments);
@@ -90,10 +99,11 @@ public class DashboardTeacherPage extends Menu {
 			click(gradeIt);
 			GradingPage gradingPage = new GradingPage(driver);
 			gradingPage.grade(true, "commentsText");
-			checkAttribute(alert, "text", "Your comments have been saved!", true);
 
 			// Add transactionId from grading page and finalise return array
-			user.getTransactions().get(type).put(name, gradingPage.transactionId);
+			if (user.getTransactions().containsKey(type)) {
+				user.getTransactions().get(type).put(name, gradingPage.transactionId);
+			}
 		}
 	}
 
@@ -137,25 +147,18 @@ public class DashboardTeacherPage extends Menu {
 	 * 
 	 */
 	private HashMap<String, HashMap<String, String>> putAssignmentsInList(ArrayList<WebElement> assignments) {
-		HashMap<String, HashMap<String, String>> listAssignments = Transaction.getTransactionsHashMap();
-		
-		HashMap<String, String> students = new HashMap<>();
+		HashMap<String, HashMap<String, String>> listAssignments = Transaction.getAllTransactionsHashMap();
 		String studentName, challengeName, date;
 
 		for (int i = 0; i < assignments.size(); i++) {
-			ArrayList<String> entry = new ArrayList<String>();
-
 			studentName = getText(assignments.get(i).findElement(By.cssSelector("td:nth-child(1)")));
 			challengeName = getText(assignments.get(i).findElement(By.cssSelector("td:nth-child(2)"))).toLowerCase();
 			date = getText(assignments.get(i).findElement(By.cssSelector("td:nth-child(3)")));
 
-			// Preserve the order
-			entry.add(challengeName.toLowerCase());
-			entry.add(studentName.toLowerCase());
-			entry.add(date);
+			if (listAssignments.containsKey(challengeName)) {
+				listAssignments.get(challengeName).put(studentName.toLowerCase(), date);
+			}
 
-			students.put(studentName, date);
-			listAssignments.put(challengeName, students);
 		}
 
 		return listAssignments;
@@ -165,21 +168,66 @@ public class DashboardTeacherPage extends Menu {
 	 * This method is to check that all students' assignments are on the
 	 * dashboard
 	 * 
-	 * @param assignments
-	 * @return ArrayList<ArrayList<String>>
+	 * @param transactions
+	 * @return HashMap<String, HashMap<String, String>> transactions
 	 * 
 	 */
-	public void checkAssignments(HashMap<String, HashMap<String, String>> assignments,
-			HashMap<String, HashMap<String, String>> transactions) {
+	public void getAssignmentToGrade(HashMap<String, HashMap<String, String>> transactions) {
+		if (present(challengeType)) {
+			String type = getText(challengeType).toLowerCase();
+			String name = getText(studentName);
+			name = name.substring(0, name.indexOf(" "));
+			String dateDue = getText(date);
 
-		String nonWritingAssignments = Integer.toString(assignments.get("art").size() + assignments.get("engineering").size());
-		String writingAssignments = Integer.toString(assignments.get("writing").size());
-		
-		checkAttribute(miscellaneousInfo, "text",
-				"Miscellaneous challenges remaining to be graded: " + nonWritingAssignments,
+			transactions.get(type).put(name, dateDue);
+		}
+	}
+
+	/**
+	 * This method is to check that all students' assignments are on the
+	 * dashboard
+	 * 
+	 * @param transactions
+	 * @return HashMap<String, HashMap<String, String>> transactions
+	 * 
+	 */
+	public void checkAssignments(HashMap<String, HashMap<String, String>> transactions) {
+		// add an assignment that is ready for grading
+		getAssignmentToGrade(allAssignments);
+		Transaction.removeEmpty(allAssignments);
+
+		// check all the assignments on the page
+		// Iterate over challenges in student HashMap
+		int nonWritingCount = 0;
+		int writingCount = 0;
+
+		for (int i = 0; i < CsvFileReader.CHALLENGES_ACTUAL.length; i++) {
+			String challengeType = CsvFileReader.CHALLENGES_ACTUAL[i];
+			if (challengeType != "writing") {
+				if (nonWritingAssignments.containsKey(challengeType)) {
+					if (!nonWritingAssignments.get(challengeType).isEmpty()) {
+						nonWritingCount = nonWritingCount + nonWritingAssignments.get(challengeType).size();
+					}
+				}
+			} else {
+				if (writingAssignments.containsKey(challengeType)) {
+					if (!writingAssignments.get(challengeType).isEmpty()) {
+						writingCount = writingCount + writingAssignments.get(challengeType).size();
+					}
+				}
+			}
+		}
+
+		String nonWriting = Integer.toString(nonWritingCount);
+		String writing = Integer.toString(writingCount);
+
+		checkAttribute(miscellaneousInfo, "text", "Miscellaneous challenges remaining to be graded: " + nonWriting,
 				true);
-		checkAttribute(writingInfo, "text",
-				"Writing challenges remaining to be graded: " + writingAssignments, true);
+		checkAttribute(writingInfo, "text", "Writing challenges remaining to be graded: " + writing, true);
+
+		if (nonWritingCount + writingCount == 0) {
+			return;
+		}
 
 		// Iterate over challenges' types
 		Iterator<Entry<String, HashMap<String, String>>> itTypes = transactions.entrySet().iterator();
@@ -191,10 +239,12 @@ public class DashboardTeacherPage extends Menu {
 			Iterator<Entry<String, String>> itStudents = types.getValue().entrySet().iterator();
 			while (itStudents.hasNext()) {
 				Map.Entry<String, String> students = (Map.Entry<String, String>) itStudents.next();
-				if (!assignments.get(types.getKey()).containsKey(students.getKey())) {
-					logger.error("An assignment for student: '" + students.getKey() + "' and challenge '"
-							+ types.getKey() + "' is not found in transactions list: \r\n\""
-							+ Transaction.transactionsToString(transactions));
+				if (allAssignments.get(types.getKey()) == null
+						|| !allAssignments.get(types.getKey()).containsKey(students.getKey())) {
+					logger.error(System.lineSeparator() + "An assignment for student: '" + students.getKey()
+							+ "' and challenge '" + types.getKey() + "' is not found in assignments list: "
+							+ System.lineSeparator()
+							+ Transaction.transactionsToString(Transaction.transactionsToArrayList(allAssignments)));
 				}
 			}
 		}

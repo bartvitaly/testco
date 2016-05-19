@@ -33,7 +33,11 @@ public class GradingPage extends Menu {
 	public GradingPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		logger.info("Opened Grading page");
+		
 		transactionId = getAttribute(transactionIdElement, "value");
+		if (transactionId == null) {
+			transactionId = "";
+		}
 	}
 
 	/**
@@ -48,8 +52,11 @@ public class GradingPage extends Menu {
 		} else {
 			click(needsWork);
 		}
+		
 		type(comments, commentsText);
 		click(submit);
+		
+		checkAttribute(alert, "text", "Your comments have been saved!", true);
 	}
 
 }
