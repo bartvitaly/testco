@@ -1,8 +1,10 @@
 package com.brainchase.common;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -47,7 +50,7 @@ public class Common {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * This method is to generate random string
 	 * 
@@ -139,6 +142,26 @@ public class Common {
 	}
 
 	/**
+	 * This method is to read from file to array
+	 * 
+	 * @param filename
+	 * @param encoding
+	 * @return String
+	 * 
+	 */
+	public static String[] readLines(String filename) throws IOException {
+		FileReader fileReader = new FileReader(filename);
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		List<String> lines = new ArrayList<String>();
+		String line = null;
+		while ((line = bufferedReader.readLine()) != null) {
+			lines.add(line);
+		}
+		bufferedReader.close();
+		return lines.toArray(new String[lines.size()]);
+	}
+
+	/**
 	 * This method is to write to file
 	 * 
 	 * @param path
@@ -147,7 +170,7 @@ public class Common {
 	 * 
 	 */
 	public static void writeToFile(String path, String text) throws IOException {
-		 Writer writer = null;
+		Writer writer = null;
 
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
@@ -155,7 +178,7 @@ public class Common {
 		} catch (IOException ex) {
 		} finally {
 			try {
-				 writer.close();
+				writer.close();
 			} catch (Exception ex) {
 			}
 		}

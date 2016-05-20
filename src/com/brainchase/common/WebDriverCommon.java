@@ -53,7 +53,7 @@ public class WebDriverCommon {
 	 * 
 	 */
 	public static void takeScreenshot(WebDriver driver) {
-		String fileName = "\\test-output\\screenshot.png";
+		String fileName = File.separator + "test-output" + File.separator + "screenshot.png";
 		logger.debug("Taking screenshot.");
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
@@ -177,14 +177,15 @@ public class WebDriverCommon {
 	 * This method is to click on element using WebElement or By object
 	 * 
 	 * @param obj
+	 * @throws InterruptedException
 	 */
-	protected void click(Object obj) {
+	protected void click(Object obj) throws InterruptedException {
 		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
 			action.moveToElement(element).build().perform();
 			action.click(element).build().perform();
-			// element.click();
+			waitForPageLoaded(driver);
 		} catch (Exception e) {
 			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
 		}
@@ -195,8 +196,9 @@ public class WebDriverCommon {
 	 * for page to load
 	 * 
 	 * @param obj
+	 * @throws InterruptedException
 	 */
-	protected void click_wait(Object obj) {
+	protected void click_wait(Object obj) throws InterruptedException {
 		click(obj);
 		logger.debug("Waiting for page to load '" + driver.getCurrentUrl() + "'");
 		try {
@@ -219,6 +221,7 @@ public class WebDriverCommon {
 		WebElement element = getElement(obj);
 		try {
 			element.click();
+			element.clear();
 			element.sendKeys((String) text);
 		} catch (Exception e) {
 			logger.error("A text '" + text + "' was not filled in the element '" + obj + "' on page '"
@@ -260,8 +263,9 @@ public class WebDriverCommon {
 	 * @param by
 	 * @param by
 	 * @param text
+	 * @throws InterruptedException
 	 */
-	protected void select(By by, By byChild, String text) {
+	protected void select(By by, By byChild, String text) throws InterruptedException {
 		click(by);
 		click(byChild);
 	}
@@ -384,8 +388,12 @@ public class WebDriverCommon {
 		if (attribute.equals("text")) {
 			return getText(element);
 		}
+		String attributeValue = element.getAttribute(attribute);
+		if (attributeValue == null) {
+			attributeValue = "";
+		}
 
-		return element.getAttribute(attribute);
+		return attributeValue;
 	}
 
 }

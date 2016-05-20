@@ -37,12 +37,12 @@ public class DashboardStudentPage extends Menu {
 	private static By videoClose = By.cssSelector(".fancybox-close");
 	private static By weekContainer = By.cssSelector(".week-container");
 
-	private static By engineeringChallenge = By.cssSelector("[style*='engineering'] span");
-	private static By mathChallenge = By.cssSelector("[style*='math'] span");
-	private static By readingChallenge = By.cssSelector("[style*='reading'] span");
-	private static By writingChallenge = By.cssSelector("[style*='writing'] span");
-	private static By artChallenge = By.cssSelector("[style*='art'] span");
-	private static By bonusChallenge = By.cssSelector("[style*='bonus'] span");
+	private static By engineeringChallenge = By.cssSelector("[style*='engineering']");
+	private static By mathChallenge = By.cssSelector("[style*='math']");
+	private static By readingChallenge = By.cssSelector("[style*='reading']");
+	private static By writingChallenge = By.cssSelector("[style*='writing']");
+	private static By artChallenge = By.cssSelector("[style*='art']");
+	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
 
 	/**
 	 * This is constructor that sets a web driver for the page object
@@ -70,7 +70,7 @@ public class DashboardStudentPage extends Menu {
 		// If Challenges are not enabled click introductory video and close it
 		// then
 		String challengeStatus = getAttribute(engineeringChallenge, "class");
-		if (challengeStatus.equals(CHALLENGE_ACTIVE)) {
+		if (challengeStatus.equals("")) {
 			click(introductory);
 			click(videoClose);
 			super.driver.navigate().refresh();

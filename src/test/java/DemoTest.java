@@ -74,8 +74,10 @@ public class DemoTest extends Initialize {
 	 */
 	@DataProvider(parallel = true, name = "demoProvider")
 	public static User[][] user() throws IOException {
-		users = CsvFileReader.readUsersFile(Common.canonicalPath() + "\\users.csv", "student").get(0);
-		allUsers = CsvFileReader.readUsersFile(Common.canonicalPath() + "\\users.csv", "student").get(1);
+		users = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student")
+				.get(0);
+		allUsers = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student")
+				.get(1);
 		return User.getUsers(users, PropertiesUtils.getInt("students_number"));
 	}
 
@@ -107,7 +109,8 @@ public class DemoTest extends Initialize {
 	@Test(groups = { "demo" }, dependsOnMethods = { "student" })
 	public void teacher() throws Exception {
 		// Get a teacher data from file
-		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + "\\users.csv", "teacher").get(0).get(0);
+		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
+				.get(0).get(0);
 
 		// Go to Dashboard page
 		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
@@ -127,8 +130,8 @@ public class DemoTest extends Initialize {
 	@Test(groups = { "demo" }, dependsOnMethods = { "teacher" })
 	public void supervisor() throws Exception {
 		// Get a teacher data from file
-		User supervisor = CsvFileReader.readUsersFile(Common.canonicalPath() + "\\users.csv", "supervisor").get(0)
-				.get(0);
+		User supervisor = CsvFileReader
+				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
 
 		// Go to Dashboard page
 		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) login(supervisor);
@@ -165,7 +168,7 @@ public class DemoTest extends Initialize {
 		transactionsToCompare.add(dashboardSupervisor);
 		transactionsToCompare.add(transactionsSupervisor);
 
-		HTMLBuilder.create(transactionsToCompare, Common.canonicalPath() + "\\transactions.html");
+		HTMLBuilder.create(transactionsToCompare, Common.canonicalPath() + File.separator + "transactions.html");
 	}
 
 	/**

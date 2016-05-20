@@ -115,7 +115,7 @@ public class DashboardTeacherPage extends Menu {
 	 * @throws InterruptedException
 	 * 
 	 */
-	private Boolean getNewAssignmentToGrade() {
+	private Boolean getNewAssignmentToGrade() throws InterruptedException {
 		if (!present(gradeIt)) {
 			click(getNewAssignment);
 			if (!present(gradeIt)) {

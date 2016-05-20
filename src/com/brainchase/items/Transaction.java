@@ -23,7 +23,7 @@ public class Transaction {
 	final static Logger logger = Logger.getLogger(DashboardTeacherPage.class);
 	String studentName, challengeType, transactionid;
 	public static ArrayList<Challenge> challenges = CsvFileReader
-			.readChallengesFile(Common.canonicalPath() + "\\challenges.csv");
+			.readChallengesFile(Common.canonicalPath() + File.separator + "challenges.csv");
 
 	/**
 	 * This is constructor of the class
@@ -103,7 +103,7 @@ public class Transaction {
 		for (int i = 0; i < students.size(); i++) {
 			transactionsLocal.putAll((students.get(i).getTransactions()));
 		}
-		writeTransactions(Common.canonicalPath() + "\\transactionsStudent.csv", transactionsLocal);
+		writeTransactions(Common.canonicalPath() + File.separator + "transactionsStudent.csv", transactionsLocal);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class Transaction {
 	 */
 	public static void writeTeacherTransactions(HashMap<String, HashMap<String, String>> transactions)
 			throws IOException {
-		writeTransactions(Common.canonicalPath() + "\\transactionsTeacher.csv", transactions);
+		writeTransactions(Common.canonicalPath() + File.separator + "transactionsTeacher.csv", transactions);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class Transaction {
 	 */
 	public static void writeSupervisorTransactions(HashMap<String, HashMap<String, String>> transactions)
 			throws IOException {
-		writeTransactions(Common.canonicalPath() + "\\transactionsSupervisor.csv", transactions);
+		writeTransactions(Common.canonicalPath() + File.separator + "transactionsSupervisor.csv", transactions);
 	}
 
 	/**
@@ -172,8 +172,8 @@ public class Transaction {
 	public static ArrayList<ArrayList<String>> compareTransactions(HashMap<String, HashMap<String, String>> transaction,
 			HashMap<String, HashMap<String, String>> transaction2, Boolean transactions) {
 
-		logger.info("Comparing transactions:\r\n" + transactionsToString(transactionsToArrayList(transaction))
-				+ "\r\n" + transactionsToString(transactionsToArrayList(transaction2)));
+		logger.info("Comparing transactions:\r\n" + transactionsToString(transactionsToArrayList(transaction)) + "\r\n"
+				+ transactionsToString(transactionsToArrayList(transaction2)));
 
 		removeEmpty(transaction);
 		removeEmpty(transaction2);
@@ -187,18 +187,20 @@ public class Transaction {
 			for (String student : transaction.get(challenge).keySet()) {
 				ArrayList<String> row = new ArrayList<String>();
 				if (transactions) {
-					if (transaction2.containsKey(challenge) && transaction2.get(challenge).get(student).equals(transaction.get(challenge).get(student))) {
+					if (transaction2.containsKey(challenge) && transaction2.get(challenge).get(student)
+							.equals(transaction.get(challenge).get(student))) {
 						result = true;
 					}
 				} else {
-					if (transaction2.containsKey(challenge) && !transaction2.get(challenge).isEmpty() && transaction2.get(challenge).get(student) != null) {
+					if (transaction2.containsKey(challenge) && !transaction2.get(challenge).isEmpty()
+							&& transaction2.get(challenge).get(student) != null) {
 						result = true;
 					}
 				}
 				row.add(challenge);
 				row.add(student);
 				if (transactions) {
-					if (!transaction.containsKey(challenge) ||transaction.get(challenge).isEmpty()) {
+					if (!transaction.containsKey(challenge) || transaction.get(challenge).isEmpty()) {
 						row.add("");
 					} else {
 						row.add(transaction.get(challenge).get(student));

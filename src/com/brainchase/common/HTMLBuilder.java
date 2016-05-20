@@ -1,6 +1,8 @@
 package com.brainchase.common;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,6 +39,17 @@ public class HTMLBuilder {
 		drawNonStudent(sb, transactions, "Teacher");
 		appendTag(sb, "h3", " ");
 		drawNonStudent(sb, transactions, "Supervisor");
+
+		// Add users
+		sb.append("<table>");
+		appendTag(sb, "h3", "User file");
+		String[] lines = Common.readLines(Common.canonicalPath() + File.separator + "users.csv");
+		for (int i = 0; i < lines.length; i++) {
+			sb.append("<tr><td>");
+			sb.append(lines[i]);
+			sb.append("</td></tr>");
+		}
+		sb.append("</table>");
 
 		sb.append("</body>");
 		sb.append("</html>");
@@ -115,8 +128,13 @@ public class HTMLBuilder {
 		for (int i = 0; i < table.size(); i++) {
 			sb.append("<tr>");
 			ArrayList<String> row = table.get(i);
+			String red = "<td style=\"color: #ff0000;\">";
 			for (int j = 0; j < row.size(); j++) {
-				sb.append("<td>").append(row.get(j)).append("</td>");
+				String td = "<td>";
+				if (row.get(j).equals("false")) {
+					td = red;
+				}
+				sb.append(td).append(row.get(j)).append("</td>");
 			}
 			sb.append("</tr>");
 		}

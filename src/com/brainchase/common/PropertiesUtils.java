@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 
 public class PropertiesUtils {
 
-	final static String TEST_PROPERTIES = "\\brainchase.properties";
+	final static String TEST_PROPERTIES = File.separator + "brainchase.properties";
 	final static Logger logger = Logger.getLogger(PropertiesUtils.class);
 
 	public static String get(String key) {

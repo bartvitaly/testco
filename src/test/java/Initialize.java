@@ -14,6 +14,7 @@ import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.safari.SafariDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.BeforeMethod;
@@ -43,7 +44,11 @@ public class Initialize {
 		String browser = PropertiesUtils.get("browser");
 
 		if (browser.equals("chrome")) {
-			System.setProperty("webdriver.chrome.driver", (new File("drivers/chromedriver.exe")).getAbsolutePath());
+			String chromePath = (new File("drivers/chromedriver.exe")).getAbsolutePath();
+			if (!System.getProperty("os.name").contains("Windows")) {
+				chromePath = (new File("drivers/chromedriver_mac")).getAbsolutePath();
+			}
+			System.setProperty("webdriver.chrome.driver", chromePath);
 			driver.set(new ChromeDriver());
 		} else if (browser.equals("ie")) {
 			DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
@@ -54,6 +59,8 @@ public class Initialize {
 			driver.set(new InternetExplorerDriver(capabilities));
 		} else if (browser.equals("firefox")) {
 			driver.set(new MarionetteDriver());
+		} else if (browser.equals("safari")) {
+			driver.set(new SafariDriver());
 		} else {
 			driver.set(new HtmlUnitDriver());
 		}

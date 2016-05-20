@@ -15,15 +15,15 @@ import com.brainchase.items.User;
  */
 public class GradingPage extends Menu {
 	final static Logger logger = Logger.getLogger(GradingPage.class);
-	String transactionId; 
-	
+	String transactionId;
+
 	private static By transactionIdElement = By.cssSelector("[name='transaction_id']");
-	
-	private static By accepted  = By.cssSelector("[id=edit-accepted-1]");
+
+	private static By accepted = By.cssSelector("[id=edit-accepted-1]");
 	private static By needsWork = By.cssSelector("[id=edit-accepted-0]");
-	private static By comments  = By.cssSelector("[id=edit-comments]");
-	private static By submit    = By.cssSelector("[id=comments-submit-save]");
-	
+	private static By comments = By.cssSelector("[id=edit-comments]");
+	private static By submit = By.cssSelector("[id=comments-submit-save]");
+
 	/**
 	 * This is constructor that sets a web driver for the page object
 	 * 
@@ -33,11 +33,7 @@ public class GradingPage extends Menu {
 	public GradingPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		logger.info("Opened Grading page");
-		
-		transactionId = getAttribute(transactionIdElement, "value");
-		if (transactionId == null) {
-			transactionId = "";
-		}
+		setTransactionId();
 	}
 
 	/**
@@ -45,18 +41,34 @@ public class GradingPage extends Menu {
 	 * 
 	 * @param User
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public void grade(Boolean accept, String commentsText) {
+	public void grade(Boolean accept, String commentsText) throws InterruptedException {
 		if (accept) {
 			click(accepted);
 		} else {
 			click(needsWork);
 		}
-		
+
 		type(comments, commentsText);
+		setTransactionId();
 		click(submit);
-		
+
 		checkAttribute(alert, "text", "Your comments have been saved!", true);
+	}
+
+	/**
+	 * This method is to set transactionID
+	 * 
+	 * @return
+	 */
+	void setTransactionId() {
+		if (transactionId == null || transactionId.equals("")) {
+			transactionId = getAttribute(transactionIdElement, "value");
+		}
+		if (transactionId == null) {
+			transactionId = "";
+		}
 	}
 
 }
