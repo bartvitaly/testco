@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 
 /**
  * 
+ * This class contains methods to work with files and data structures
+ * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -182,6 +184,17 @@ public class Common {
 			} catch (Exception ex) {
 			}
 		}
+	}
+
+	/**
+	 * This method is to return random Boolean
+	 * 
+	 * @return Boolean
+	 * 
+	 */
+	public static boolean getRandomBoolean() {
+		Random random = new Random();
+		return random.nextBoolean();
 	}
 
 }

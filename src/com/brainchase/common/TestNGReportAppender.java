@@ -8,6 +8,8 @@ import org.testng.Reporter;
 
 /**
  * 
+ * This class describes TestNG appender
+ * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -32,6 +34,10 @@ public class TestNGReportAppender extends AppenderSkeleton {
 		return result.toString();
 	}
 
+	/**
+	 * This method is to get assertion
+	 * 
+	 */
 	public SoftAssert getAssert() {
 		return m_assert;
 	}

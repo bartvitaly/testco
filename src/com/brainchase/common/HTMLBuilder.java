@@ -17,6 +17,13 @@ import com.brainchase.items.Transaction;
  */
 public class HTMLBuilder {
 
+	/**
+	 * This method is to create HTML report
+	 * 
+	 * @param transactions
+	 * @param path
+	 * 
+	 */
 	public static void create(ArrayList<HashMap<String, HashMap<String, String>>> transactions, String path)
 			throws IOException {
 		StringBuilder sb = new StringBuilder();

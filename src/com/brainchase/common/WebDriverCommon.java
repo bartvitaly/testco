@@ -22,7 +22,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * 
- * This class
+ * This class contains WebDriver methods
  * 
  * @author vbartashchuk@testco.com
  *
@@ -70,7 +70,7 @@ public class WebDriverCommon {
 	 * 
 	 */
 	protected static void waitForPageLoaded(WebDriver driver) throws InterruptedException {
-		Thread.sleep(5000);
+		// Thread.sleep(1000);
 		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
 		for (int i = 0; i < tabs.size(); i++) {
 			driver.switchTo().window(tabs.get(i));
@@ -97,7 +97,6 @@ public class WebDriverCommon {
 	 * @param timeout
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	protected static WebElement waitForElement(WebDriver driver, final By by, int timeout) {
 		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
 

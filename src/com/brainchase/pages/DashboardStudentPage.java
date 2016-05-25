@@ -1,24 +1,17 @@
 package com.brainchase.pages;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
-import com.brainchase.common.Common;
-import com.brainchase.common.WebDriverCommon;
-import com.brainchase.items.Challenge;
 import com.brainchase.items.Student;
-import com.brainchase.items.User;
 
 /**
- * This class describes a student's dashboard page of the web site and page
+ * This class describes a student's dashboard page of the web site and the page
  * elements
  * 
  * @author vbartashchuk@testco.com
@@ -94,7 +87,8 @@ public class DashboardStudentPage extends Menu {
 			String challengeType = transactions.getKey();
 			String challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
 			if (challengeStatus.equals(CHALLENGE_SUBMITTED) || challengeStatus.equals(CHALLENGE_GRADED)) {
-//				student.getTransactions().get(challengeType).put(student.name, "");
+				// student.getTransactions().get(challengeType).put(student.name,
+				// "");
 			} else {
 				ChallengePage challengePage = openChallenge(challengeType);
 				challengePage.submitChallenge(student, challengeType);

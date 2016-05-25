@@ -4,9 +4,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-import com.brainchase.common.WebDriverCommon;
-import com.brainchase.items.User;
-
 /**
  * This class describes a grading page of the web site and page elements
  * 
