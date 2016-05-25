@@ -59,11 +59,6 @@ public class DemoTest extends Initialize {
 	static ConcurrentHashMap<String, HashMap<String, String>> transactionsCopySupervisor = Transaction
 			.getTransactionsConcurrentHashMap();
 
-	User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher").get(0)
-			.get(0);
-	User supervisor = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor")
-			.get(0).get(0);
-
 	@BeforeMethod(groups = { "demo" })
 	public void setUp() throws Exception {
 		TestNGReportAppender appender = new TestNGReportAppender();
@@ -101,6 +96,10 @@ public class DemoTest extends Initialize {
 	public void gradeAllAssignments() throws Exception {
 		// Grade all assignments
 		gradeNumber = PropertiesUtils.getInt("grade_number");
+		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
+				.get(0).get(0);
+		User supervisor = CsvFileReader
+				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
 		clear(teacher);
 		clear(supervisor);
 	}
@@ -124,9 +123,41 @@ public class DemoTest extends Initialize {
 	}
 
 	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "student" })
-	public void test(Transaction transaction) throws Exception {
-		teacher();
-		supervisor();
+	public void teacher(Transaction transaction) throws Exception {
+		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
+				.get(0).get(0);
+		// Go to Dashboard page
+		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
+
+		// Check transactions are shown on Dashboard
+		dashboardPage.checkAssignments(transactionsStudent);
+		dashboardTeacher = Transaction.addTransactions(dashboardTeacher, dashboardPage.allAssignments);
+
+		// Grade an assignment
+		dashboardPage.grade(teacher, transactionsCopyTeacher);
+		dashboardPage.logout();
+
+		// Write teacher transactions to a file
+		transactionsTeacher = Transaction.addTransactions(transactionsTeacher, teacher.getTransactions());
+	}
+
+	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "teacher" })
+	public void supervisor(Transaction transaction) throws Exception {
+		User supervisor = CsvFileReader
+				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
+		// Go to Dashboard page
+		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) login(supervisor);
+
+		// Check transactions are shown on Dashboard
+		dashboardPage.checkAssignments(transactionsStudent);
+		dashboardSupervisor = Transaction.addTransactions(dashboardSupervisor, dashboardPage.allAssignments);
+
+		// Grade an assignment
+		dashboardPage.grade(supervisor, transactionsCopySupervisor);
+		dashboardPage.logout();
+
+		// Write teacher transactions to a file
+		transactionsSupervisor = Transaction.addTransactions(transactionsSupervisor, supervisor.getTransactions());
 	}
 
 	public void clear(User user) throws Exception {
@@ -136,38 +167,6 @@ public class DemoTest extends Initialize {
 		// Grade an assignment
 		dashboardPage.grade(user, PropertiesUtils.getInt("grade_number"));
 		dashboardPage.logout();
-	}
-
-	public void teacher() throws Exception {
-		// Go to Dashboard page
-		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
-
-		// Check transactions are shown on Dashboard
-		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardTeacher = dashboardPage.allAssignments;
-
-		// Grade an assignment
-		dashboardPage.grade(teacher, transactionsCopyTeacher);
-		dashboardPage.logout();
-
-		// Write teacher transactions to a file
-		transactionsTeacher = teacher.getTransactions();
-	}
-
-	public void supervisor() throws Exception {
-		// Go to Dashboard page
-		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) login(supervisor);
-
-		// Check transactions are shown on Dashboard
-		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardSupervisor = dashboardPage.allAssignments;
-
-		// Grade an assignment
-		dashboardPage.grade(supervisor, transactionsCopySupervisor);
-		dashboardPage.logout();
-
-		// Write teacher transactions to a file
-		transactionsSupervisor = supervisor.getTransactions();
 	}
 
 	@AfterMethod(groups = { "demo" })

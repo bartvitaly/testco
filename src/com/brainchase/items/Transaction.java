@@ -235,6 +235,8 @@ public class Transaction {
 				if (transactions) {
 					if (transaction2.containsKey(challenge) && !transaction2.get(challenge).isEmpty()
 							&& transaction.containsKey(challenge) && !transaction.get(challenge).isEmpty()
+							&& transaction2.get(challenge).containsKey(student)
+							&& transaction.get(challenge).containsKey(student)
 							&& !transaction2.get(challenge).get(student).isEmpty()
 							&& !transaction.get(challenge).get(student).isEmpty() && transaction2.get(challenge)
 									.get(student).equals(transaction.get(challenge).get(student))) {
@@ -409,10 +411,8 @@ public class Transaction {
 					}
 				}
 			}
-			System.out.println("Removed");
 			return true;
 		} catch (Exception e) {
-			System.out.println("Exception");
 			return false;
 		}
 

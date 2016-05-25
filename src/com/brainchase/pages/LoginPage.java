@@ -47,6 +47,12 @@ public class LoginPage extends Menu {
 		type(password, user.password);
 		click(submit);
 		
+		if (!present(logout)) {
+			type(username, user.login);
+			type(password, user.password);
+			click(submit);	
+		}
+		
 		switch (user.type) {
 			case "teacher":
 				return new DashboardTeacherPage(driver);

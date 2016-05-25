@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -70,7 +74,13 @@ public class WebDriverCommon {
 	 * 
 	 */
 	protected static void waitForPageLoaded(WebDriver driver) throws InterruptedException {
-		// Thread.sleep(1000);
+		// Thread.sleep(2000);
+
+		// ExecutorService es = Executors.newFixedThreadPool(1);
+		// Future<?> future = es.submit(new Runnable() {
+		//
+		// @Override
+		// public void run() {
 		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
 		for (int i = 0; i < tabs.size(); i++) {
 			driver.switchTo().window(tabs.get(i));
@@ -87,7 +97,18 @@ public class WebDriverCommon {
 				Assert.assertFalse("Timeout waiting for Page Load Request to complete.", true);
 			}
 		}
+
 	}
+
+	// });
+	//
+	// try {
+	// future.get(PropertiesUtils.getInt("timeout"), TimeUnit.SECONDS);
+	// } catch (Exception e) {
+	// future.cancel(true);
+	// }
+
+	// }
 
 	/**
 	 * This method is to wait till an element appears
@@ -252,6 +273,9 @@ public class WebDriverCommon {
 	protected String getText(Object obj) {
 		logger.debug("Getting text from element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
+		if (element == null) {
+			return "";
+		}
 		return element.getText().toString();
 	}
 
@@ -352,6 +376,9 @@ public class WebDriverCommon {
 	 * @return Boolean
 	 */
 	protected boolean checkAttribute(Object obj, String attribute, Object value, boolean throwError) {
+		if (obj == null) {
+			return false;
+		}
 		value = String.valueOf(value);
 		logger.debug(
 				"Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");

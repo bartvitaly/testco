@@ -14,7 +14,7 @@ import com.brainchase.items.User;
 
 /**
  * 
- * This file is to read csv files
+ * This class is to read csv files
  * 
  * @author vbartashchuk@testco.com
  *
