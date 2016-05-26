@@ -59,6 +59,9 @@ public class DemoTest extends Initialize {
 	static ConcurrentHashMap<String, HashMap<String, String>> transactionsCopySupervisor = Transaction
 			.getTransactionsConcurrentHashMap();
 
+	Boolean teacherDashboardVerified = false;
+	Boolean supervisorDashboardVerified = false;
+
 	@BeforeMethod(groups = { "demo" })
 	public void setUp() throws Exception {
 		TestNGReportAppender appender = new TestNGReportAppender();
@@ -110,7 +113,8 @@ public class DemoTest extends Initialize {
 		final Student student = new Student(user.login, user.name, user.password, user.type);
 
 		logger.info("Open login page, fill credentials and login");
-		DashboardStudentPage dashboardPage = (DashboardStudentPage) login(user);
+		DashboardStudentPage dashboardPage;
+		dashboardPage = (DashboardStudentPage) login(student);
 
 		logger.info("A student submits challenges");
 		dashboardPage.submitChallenges(student);
@@ -118,9 +122,16 @@ public class DemoTest extends Initialize {
 		logger.info("A student logs out");
 		dashboardPage.logout();
 
-		transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
-		transactionsCopyTeacher = Transaction.addTransactions(transactionsCopyTeacher, student.getTransactions());
-		transactionsCopySupervisor = Transaction.addTransactions(transactionsCopySupervisor, student.getTransactions());
+		synchronized (transactionsStudent) {
+			transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
+		}
+		synchronized (transactionsCopyTeacher) {
+			transactionsCopyTeacher = Transaction.addTransactions(transactionsCopyTeacher, student.getTransactions());
+		}
+		synchronized (transactionsCopySupervisor) {
+			transactionsCopySupervisor = Transaction.addTransactions(transactionsCopySupervisor,
+					student.getTransactions());
+		}
 	}
 
 	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "student" })
@@ -128,11 +139,17 @@ public class DemoTest extends Initialize {
 		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
 				.get(0).get(0);
 		// Go to Dashboard page
-		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
+		LoginPage loginPage = new LoginPage(driver.get());
+		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) loginPage.login(teacher);
 
 		// Check transactions are shown on Dashboard
-		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardTeacher = Transaction.addTransactions(dashboardTeacher, dashboardPage.allAssignments);
+		synchronized (teacherDashboardVerified) {
+			if (!teacherDashboardVerified) {
+				teacherDashboardVerified = true;
+				dashboardPage.checkAssignments(transactionsStudent);
+				dashboardTeacher = Transaction.addTransactions(dashboardTeacher, dashboardPage.allAssignments);
+			}
+		}
 
 		// Grade an assignment
 		dashboardPage.grade(teacher, transactionsCopyTeacher);
@@ -147,11 +164,17 @@ public class DemoTest extends Initialize {
 		User supervisor = CsvFileReader
 				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
 		// Go to Dashboard page
-		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) login(supervisor);
+		LoginPage loginPage = new LoginPage(driver.get());
+		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) loginPage.login(supervisor);
 
 		// Check transactions are shown on Dashboard
-		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardSupervisor = Transaction.addTransactions(dashboardSupervisor, dashboardPage.allAssignments);
+		synchronized (supervisorDashboardVerified) {
+			if (!supervisorDashboardVerified) {
+				supervisorDashboardVerified = true;
+				dashboardPage.checkAssignments(transactionsStudent);
+				dashboardSupervisor = Transaction.addTransactions(dashboardSupervisor, dashboardPage.allAssignments);
+			}
+		}
 
 		// Grade an assignment
 		dashboardPage.grade(supervisor, transactionsCopySupervisor);
@@ -163,7 +186,8 @@ public class DemoTest extends Initialize {
 
 	public void clear(User user) throws Exception {
 		// Go to Dashboard page
-		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(user);
+		LoginPage loginPage = new LoginPage(driver.get());
+		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) loginPage.login(user);
 
 		// Grade an assignment
 		dashboardPage.grade(user, PropertiesUtils.getInt("grade_number"));

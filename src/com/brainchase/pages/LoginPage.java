@@ -17,7 +17,7 @@ public class LoginPage extends Menu {
 
 	private static By username = By.cssSelector("[id=edit-name]");
 	private static By password = By.cssSelector("[id=edit-pass]");
-	private static By submit = By.cssSelector("[id=edit-submit]");
+	private static By submit = By.xpath("//button[@id='edit-submit']");
 
 	/**
 	 * This is constructor that sets a web driver for the page object
@@ -28,7 +28,7 @@ public class LoginPage extends Menu {
 	public LoginPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		logger.info("Opened Login page.");
-		
+
 		if (present(logout)) {
 			click(logout);
 		}
@@ -43,21 +43,20 @@ public class LoginPage extends Menu {
 	 */
 	public Object login(User user) throws InterruptedException {
 		logger.info("Fill username '" + user.name + "' and password '" + user.password + "' and click login");
+
+		// int i = 0;
+		// while (!present(logout) && i < 10) {
 		type(username, user.login);
 		type(password, user.password);
 		click(submit);
-		
-		if (!present(logout)) {
-			type(username, user.login);
-			type(password, user.password);
-			click(submit);	
-		}
-		
+		// i++;
+		// }
+
 		switch (user.type) {
-			case "teacher":
-				return new DashboardTeacherPage(driver);
-			case "supervisor":
-				return new DashboardSupervisorPage(driver);
+		case "teacher":
+			return new DashboardTeacherPage(driver);
+		case "supervisor":
+			return new DashboardSupervisorPage(driver);
 		}
 		return new DashboardStudentPage(driver);
 	}

@@ -74,7 +74,7 @@ public class WebDriverCommon {
 	 * 
 	 */
 	protected static void waitForPageLoaded(WebDriver driver) throws InterruptedException {
-		// Thread.sleep(2000);
+		Thread.sleep(2000);
 
 		// ExecutorService es = Executors.newFixedThreadPool(1);
 		// Future<?> future = es.submit(new Runnable() {
@@ -166,6 +166,23 @@ public class WebDriverCommon {
 	}
 
 	/**
+	 * This method is to click and wait till another element sappears
+	 * 
+	 * @param driver
+	 * @param by
+	 * @param timeout
+	 * @throws InterruptedException
+	 * 
+	 */
+	protected void click_wait(By elementToClick, By elementToWait) throws InterruptedException {
+		int i = 0;
+		while (!present(elementToWait) && i < 10) {
+			click(elementToClick);
+			i++;
+		}
+	}
+
+	/**
 	 * This method is to wait till an element disappears
 	 * 
 	 * @param driver
@@ -234,15 +251,19 @@ public class WebDriverCommon {
 	 * @param obj
 	 * @param text
 	 */
-	protected synchronized void type(Object obj, Object text) {
+	protected void type(Object obj, Object text) {
 		text = String.valueOf(text);
 		logger.debug(
 				"Filling a text '" + text + "' into the field '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
+//		int i = 0;
 		try {
-			element.click();
-			element.clear();
-			element.sendKeys((String) text);
+//			while (!getAttribute(element, "value").equals(text) && i < 10) {
+				element.click();
+				element.clear();
+				element.sendKeys((String) text);
+			// i++;
+			// }
 		} catch (Exception e) {
 			logger.error("A text '" + text + "' was not filled in the element '" + obj + "' on page '"
 					+ driver.getCurrentUrl() + "'");
@@ -390,7 +411,7 @@ public class WebDriverCommon {
 		if (!(attributeActual.contains((String) value)) && throwError) { // ||
 																			// ((String)
 																			// value).contains(attributeActual)
-			logger.error("Verify verification of attribute '" + attribute + "' failed. Expected value '" + value
+			logger.error("Verification of an attribute '" + attribute + "' failed. Expected value '" + value
 					+ "', actual is '" + attributeActual + "' for an object '" + obj + "'");
 			return false;
 		}
