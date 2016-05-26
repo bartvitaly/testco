@@ -45,12 +45,14 @@ public class LoginPage extends Menu {
 		logger.info("Fill username '" + user.name + "' and password '" + user.password + "' and click login");
 		type(username, user.login);
 		type(password, user.password);
-		click(submit);
+		clickEnter(password);
+//		click(submit);
 		
 		if (!present(logout)) {
 			type(username, user.login);
 			type(password, user.password);
-			click(submit);	
+			clickEnter(password);
+			// click(submit);
 		}
 		
 		switch (user.type) {

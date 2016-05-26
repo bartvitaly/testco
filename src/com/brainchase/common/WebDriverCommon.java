@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -205,6 +206,24 @@ public class WebDriverCommon {
 		try {
 			action.moveToElement(element).build().perform();
 			action.click(element).build().perform();
+			waitForPageLoaded(driver);
+		} catch (Exception e) {
+			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
+		}
+	}
+
+	/**
+	 * This method is to click Enter on element using WebElement or By object
+	 * 
+	 * @param obj
+	 * @throws InterruptedException
+	 */
+	protected void clickEnter(Object obj) throws InterruptedException {
+		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		WebElement element = getElement(obj);
+		try {
+			action.moveToElement(element).build().perform();
+			element.sendKeys(Keys.RETURN);
 			waitForPageLoaded(driver);
 		} catch (Exception e) {
 			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
