@@ -46,7 +46,7 @@ public class Transaction {
 	 * @param transactionNew
 	 * @return
 	 */
-	public static HashMap<String, HashMap<String, String>> addTransactions(
+	public synchronized static HashMap<String, HashMap<String, String>> addTransactions(
 			HashMap<String, HashMap<String, String>> transactionsOld,
 			HashMap<String, HashMap<String, String>> transactionsNew) {
 
@@ -371,7 +371,7 @@ public class Transaction {
 	 */
 	public static Transaction[][] getTransactions(HashMap<String, HashMap<String, String>> transactions)
 			throws IOException {
-		Transaction[][] dataProviderArray = new Transaction[PropertiesUtils.getInt("grade_parallel_max")][1];
+		Transaction[][] dataProviderArray = new Transaction[PropertiesUtils.getInt("grade_parallel")][1];
 
 		return dataProviderArray;
 	}
@@ -386,8 +386,8 @@ public class Transaction {
 	public static Transaction[][] getTransactions(ConcurrentHashMap<String, HashMap<String, String>> transactions)
 			throws IOException {
 		int gradeParallel = 1 + PropertiesUtils.getInt("students_number") * transactions.size() / 2;
-		if (gradeParallel > PropertiesUtils.getInt("grade_parallel_max")) {
-			gradeParallel = PropertiesUtils.getInt("grade_parallel_max");
+		if (gradeParallel > PropertiesUtils.getInt("grade_parallel")) {
+			gradeParallel = PropertiesUtils.getInt("grade_parallel");
 		}
 		Transaction[][] dataProviderArray = new Transaction[gradeParallel][1];
 
@@ -400,8 +400,9 @@ public class Transaction {
 	 * @param transactions
 	 * 
 	 */
-	public static Boolean removeTransaction(ConcurrentHashMap<String, HashMap<String, String>> transactions,
-			String challengeTypeToGrade, String studentToGrade) {
+	public synchronized static Boolean removeTransaction(
+			ConcurrentHashMap<String, HashMap<String, String>> transactions, String challengeTypeToGrade,
+			String studentToGrade) {
 
 		try {
 			synchronized (transactions) {

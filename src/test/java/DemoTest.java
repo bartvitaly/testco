@@ -100,6 +100,7 @@ public class DemoTest extends Initialize {
 				.get(0).get(0);
 		User supervisor = CsvFileReader
 				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
+
 		clear(teacher);
 		clear(supervisor);
 	}
@@ -182,12 +183,12 @@ public class DemoTest extends Initialize {
 	@AfterGroups(groups = { "demo" })
 	public void results() throws IOException {
 		// Compare students' and teacher's transactions
-		ArrayList<HashMap<String, HashMap<String, String>>> transactionsToCompare = new ArrayList<HashMap<String, HashMap<String, String>>>();
-		transactionsToCompare.add(transactionsStudent);
-		transactionsToCompare.add(dashboardTeacher);
-		transactionsToCompare.add(transactionsTeacher);
-		transactionsToCompare.add(dashboardSupervisor);
-		transactionsToCompare.add(transactionsSupervisor);
+		HashMap<String, HashMap<String, HashMap<String, String>>> transactionsToCompare = new HashMap<String, HashMap<String, HashMap<String, String>>>();
+		transactionsToCompare.put("transactionsStudent", transactionsStudent);
+		transactionsToCompare.put("dashboardTeacher", dashboardTeacher);
+		transactionsToCompare.put("transactionsTeacher", transactionsTeacher);
+		transactionsToCompare.put("dashboardSupervisor", dashboardSupervisor);
+		transactionsToCompare.put("transactionsSupervisor", transactionsSupervisor);
 
 		HTMLBuilder.create(transactionsToCompare, Common.canonicalPath() + File.separator + "transactions.html");
 	}

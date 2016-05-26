@@ -24,7 +24,7 @@ public class HTMLBuilder {
 	 * @param path
 	 * 
 	 */
-	public static void create(ArrayList<HashMap<String, HashMap<String, String>>> transactions, String path)
+	public static void create(HashMap<String, HashMap<String, HashMap<String, String>>> transactions, String path)
 			throws IOException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
@@ -38,7 +38,7 @@ public class HTMLBuilder {
 			sb.append("<table>");
 			sb.append("<tr><td>");
 			appendTag(sb, "h3", "Student transactions");
-			appendTable(sb, Transaction.transactionsToArrayList(transactions.get(0)), "");
+			appendTable(sb, Transaction.transactionsToArrayList(transactions.get("transactionsStudent")), "");
 			sb.append("</td></tr>");
 			sb.append("</table>");
 		}
@@ -66,48 +66,48 @@ public class HTMLBuilder {
 	}
 
 	private static void drawNonStudent(StringBuilder sb,
-			ArrayList<HashMap<String, HashMap<String, String>>> transactions, String owner) {
-		int iterator = 0;
+			HashMap<String, HashMap<String, HashMap<String, String>>> transactions, String owner) {
+		// int iterator = 0;
 
-		if (owner.equals("Supervisor")) {
-			iterator = 2;
-		}
-		if (transactions.size() > 1 + iterator) {
+		// if (owner.equals("Supervisor")) {
+		// iterator = 2;
+		// }
+		if (transactions.containsKey("dashboardTeacher")) {
 			sb.append("<table>");
 			sb.append("<tr><td>");
 			appendTag(sb, "h3", owner + " dashboard");
-			appendTable(sb, Transaction.transactionsToArrayList(transactions.get(1 + iterator)), "dashboard");
+			appendTable(sb, Transaction.transactionsToArrayList(transactions.get("dashboardTeacher")), "dashboard");
 			sb.append("</td>");
 		}
 
-		if (transactions.size() > 2 + iterator) {
+		if (transactions.containsKey("transactionsTeacher")) {
 			appendTag(sb, "td", "");
 			sb.append("<td>");
 			appendTag(sb, "h3", owner + " transactions");
-			appendTable(sb, Transaction.transactionsToArrayList(transactions.get(2 + iterator)), "");
+			appendTable(sb, Transaction.transactionsToArrayList(transactions.get("transactionsTeacher")), "");
 			sb.append("</td></tr>");
 			sb.append("</table>");
 			appendTag(sb, "h3", " ");
 		}
 
-		if (transactions.size() > 1 + iterator) {
+		if (transactions.containsKey("dashboardSupervisor")) {
 			sb.append("<table>");
 			sb.append("<tr><td>");
 			appendTag(sb, "h3", "Compare Student transactions vs. " + owner + " dashboard");
 
-			appendTable(sb, Transaction.compareTransactions(transactions.get(0), transactions.get(1 + iterator), false),
-					"compare dashboard");
+			appendTable(sb, Transaction.compareTransactions(transactions.get("transactionsStudent"),
+					transactions.get("dashboardSupervisor"), false), "compare dashboard");
 
 			sb.append("</td>");
 		}
 
-		if (transactions.size() > 2 + iterator) {
+		if (transactions.containsKey("transactionsSupervisor")) {
 			appendTag(sb, "td", "");
 			sb.append("<td>");
 			appendTag(sb, "h3", "Compare Student transactions vs. " + owner + " transactions");
 
-			appendTable(sb, Transaction.compareTransactions(transactions.get(0), transactions.get(2 + iterator), true),
-					"compare");
+			appendTable(sb, Transaction.compareTransactions(transactions.get("transactionsStudent"),
+					transactions.get("transactionsSupervisor"), true), "compare");
 
 			sb.append("</td></tr>");
 			sb.append("</table>");

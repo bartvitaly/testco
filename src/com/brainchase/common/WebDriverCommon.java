@@ -234,7 +234,7 @@ public class WebDriverCommon {
 	 * @param obj
 	 * @param text
 	 */
-	protected void type(Object obj, Object text) {
+	protected synchronized void type(Object obj, Object text) {
 		text = String.valueOf(text);
 		logger.debug(
 				"Filling a text '" + text + "' into the field '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
