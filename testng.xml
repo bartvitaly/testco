@@ -1,7 +1,7 @@
-<suite name="Test-class Suite" parallel="methods">
-    <test name="student">
-        <classes>
-            <class name="test.java.DemoTest" />
-        </classes>
-    </test>
+<suite name="Test-class Suite" parallel="methods" thread-count="10">
+	<test name="student">
+		<classes>
+			<class name="test.java.DemoTest" />
+		</classes>
+	</test>
 </suite>

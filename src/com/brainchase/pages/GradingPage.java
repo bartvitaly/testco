@@ -45,9 +45,9 @@ public class GradingPage extends Menu {
 	 */
 	public void grade(Boolean accept, String commentsText) throws InterruptedException {
 		if (accept) {
-			click(accepted);
+			clickNoEnter(accepted);
 		} else {
-			click(needsWork);
+			clickNoEnter(needsWork);
 		}
 
 		type(comments, commentsText);

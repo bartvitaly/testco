@@ -164,7 +164,7 @@ public class Transaction {
 	}
 
 	/**
-	 * This method is to compare transaction vs dashboard
+	 * This method is to compare transactions
 	 * 
 	 * @param transaction
 	 * @param transaction2
@@ -187,12 +187,18 @@ public class Transaction {
 			for (String student : transaction.get(challenge).keySet()) {
 				ArrayList<String> row = new ArrayList<String>();
 				if (transactions) {
-					if (transaction2.containsKey(challenge) && transaction2.get(challenge).get(student)
-							.equals(transaction.get(challenge).get(student))) {
+					if (transaction2.containsKey(challenge) && !transaction2.get(challenge).isEmpty()
+							&& transaction.containsKey(challenge) && !transaction.get(challenge).isEmpty()
+							&& transaction2.get(challenge).containsKey(student)
+							&& transaction.get(challenge).containsKey(student)
+							&& !transaction2.get(challenge).get(student).isEmpty()
+							&& !transaction.get(challenge).get(student).isEmpty() && transaction2.get(challenge)
+									.get(student).equals(transaction.get(challenge).get(student))) {
 						result = true;
 					}
 				} else {
 					if (transaction2.containsKey(challenge) && !transaction2.get(challenge).isEmpty()
+							&& !transaction.get(challenge).isEmpty()
 							&& transaction2.get(challenge).get(student) != null) {
 						result = true;
 					}
@@ -225,12 +231,13 @@ public class Transaction {
 					row.add(challenge);
 					row.add(student);
 					if (transactions) {
-						if (transaction.get(challenge).isEmpty()) {
+						if (transaction.get(challenge).isEmpty() || !transaction.get(challenge).containsKey(student)) {
 							row.add("");
 						} else {
 							row.add(transaction.get(challenge).get(student));
 						}
-						if (transaction2.get(challenge).isEmpty()) {
+						if (transaction2.get(challenge).isEmpty()
+								|| !transaction2.get(challenge).containsKey(student)) {
 							row.add("");
 						} else {
 							row.add(transaction2.get(challenge).get(student));

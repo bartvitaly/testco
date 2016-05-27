@@ -19,6 +19,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.BeforeMethod;
 
+import com.brainchase.common.Common;
 import com.brainchase.common.PropertiesUtils;
 import com.brainchase.common.WebDriverCommon;
 
@@ -43,26 +44,24 @@ public class Initialize {
 	public WebDriver init() {
 		String browser = PropertiesUtils.get("browser");
 
-		if (browser.equals("chrome")) {
-			String chromePath = (new File("drivers/chromedriver.exe")).getAbsolutePath();
-			if (!System.getProperty("os.name").contains("Windows")) {
-				chromePath = (new File("drivers/chromedriver_mac")).getAbsolutePath();
+		if (browser.equals("random")) {
+			if (Common.getRandomBoolean()) {
+				start_chrome();
+			} else {
+				start_ie();
 			}
-			System.setProperty("webdriver.chrome.driver", chromePath);
-			driver.set(new ChromeDriver());
-		} else if (browser.equals("ie")) {
-			DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
-			capabilities.setCapability("ignoreZoomSetting", true);
-			capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-			capabilities.setCapability("requireWindowFocus", true);
-			System.setProperty("webdriver.ie.driver", (new File("drivers/IEDriverServer.exe")).getAbsolutePath());
-			driver.set(new InternetExplorerDriver(capabilities));
-		} else if (browser.equals("firefox")) {
-			driver.set(new MarionetteDriver());
-		} else if (browser.equals("safari")) {
-			driver.set(new SafariDriver());
 		} else {
-			driver.set(new HtmlUnitDriver());
+			if (browser.equals("chrome")) {
+				start_chrome();
+			} else if (browser.equals("ie")) {
+				start_ie();
+			} else if (browser.equals("firefox")) {
+				driver.set(new MarionetteDriver());
+			} else if (browser.equals("safari")) {
+				driver.set(new SafariDriver());
+			} else {
+				driver.set(new HtmlUnitDriver());
+			}
 		}
 
 		driver.get().manage().timeouts().implicitlyWait(Integer.parseInt(PropertiesUtils.get("timeout")),
@@ -71,6 +70,37 @@ public class Initialize {
 		driver.get().manage().window().maximize();
 
 		return driver.get();
+	}
+
+	/**
+	 * This method is to start chrome browser
+	 * 
+	 * @return WebDriver
+	 * 
+	 */
+	void start_chrome() {
+		String chromePath = (new File("drivers/chromedriver.exe")).getAbsolutePath();
+		if (!System.getProperty("os.name").contains("Windows")) {
+			chromePath = (new File("drivers/chromedriver_mac")).getAbsolutePath();
+		}
+		System.setProperty("webdriver.chrome.driver", chromePath);
+		driver.set(new ChromeDriver());
+	}
+
+	/**
+	 * This method is to start ie browser
+	 * 
+	 * @return WebDriver
+	 * 
+	 */
+	void start_ie() {
+		DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+		capabilities.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
+		capabilities.setCapability("ie.forceCreateProcessApi", true);
+		capabilities.setCapability("ie.browserCommandLineSwitches", "-private");
+		capabilities.setCapability("ie.ensureCleanSession", true);
+		System.setProperty("webdriver.ie.driver", (new File("drivers/IEDriverServer.exe")).getAbsolutePath());
+		driver.set(new InternetExplorerDriver(capabilities));
 	}
 
 }

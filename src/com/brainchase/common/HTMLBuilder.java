@@ -131,7 +131,7 @@ public class HTMLBuilder {
 			String red = "<td style=\"color: #ff0000;\">";
 			for (int j = 0; j < row.size(); j++) {
 				String td = "<td>";
-				if (row.get(j).equals("false")) {
+				if (row.get(j) == null || row.get(j).equals("false")) {
 					td = red;
 				}
 				sb.append(td).append(row.get(j)).append("</td>");

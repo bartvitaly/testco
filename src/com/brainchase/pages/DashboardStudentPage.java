@@ -37,12 +37,12 @@ public class DashboardStudentPage extends Menu {
 	private static By videoClose = By.cssSelector(".fancybox-close");
 	private static By weekContainer = By.cssSelector(".week-container");
 
+	private static By artChallenge = By.cssSelector("[style*='art']");
+	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
 	private static By engineeringChallenge = By.cssSelector("[style*='engineering']");
 	private static By mathChallenge = By.cssSelector("[style*='math']");
 	private static By readingChallenge = By.cssSelector("[style*='reading']");
 	private static By writingChallenge = By.cssSelector("[style*='writing']");
-	private static By artChallenge = By.cssSelector("[style*='art']");
-	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
 
 	/**
 	 * This is constructor that sets a web driver for the page object
@@ -54,6 +54,8 @@ public class DashboardStudentPage extends Menu {
 		super(driver);
 		logger.info("Opened Student's Dashboard page");
 
+		super.driver.navigate().refresh();
+		waitForPageLoaded(this.driver);
 		if (present(welcomePopup)) {
 			click(welcomePopup);
 		}
@@ -70,10 +72,12 @@ public class DashboardStudentPage extends Menu {
 		// If Challenges are not enabled click introductory video and close it
 		// then
 		String challengeStatus = getAttribute(engineeringChallenge, "class");
-		if (challengeStatus.equals("")) {
-			click(introductory);
-			click(videoClose);
+		int i = 0;
+		while (challengeStatus.equals("") && i < 10) {
+			click_wait(introductory, videoClose);
 			super.driver.navigate().refresh();
+			challengeStatus = getAttribute(engineeringChallenge, "class");
+			i++;
 		}
 
 		// Open a challenge
@@ -93,11 +97,14 @@ public class DashboardStudentPage extends Menu {
 		for (Map.Entry<String, HashMap<String, String>> transactions : student.getTransactions().entrySet()) {
 			String challengeType = transactions.getKey();
 			String challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
-			if (challengeStatus.equals(CHALLENGE_SUBMITTED) || challengeStatus.equals(CHALLENGE_GRADED)) {
-//				student.getTransactions().get(challengeType).put(student.name, "");
-			} else {
+			if (!challengeStatus.equals(CHALLENGE_SUBMITTED) && !challengeStatus.equals(CHALLENGE_GRADED)) {
 				ChallengePage challengePage = openChallenge(challengeType);
 				challengePage.submitChallenge(student, challengeType);
+				challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
+				if (!challengeStatus.equals(CHALLENGE_SUBMITTED) && !challengeStatus.equals(CHALLENGE_GRADED)) {
+					challengePage = openChallenge(challengeType);
+					challengePage.submitChallenge(student, challengeType);
+				}
 			}
 		}
 	}

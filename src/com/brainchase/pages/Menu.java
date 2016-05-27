@@ -18,6 +18,7 @@ public class Menu extends WebDriverCommon {
 	final static Logger logger = Logger.getLogger(Menu.class);
 
 	static By logout = By.cssSelector("[href*='logout']");
+	static By welcomeText = By.cssSelector(".welcome-text");
 
 	// Alert box
 	static By alert = By.cssSelector(".alert-box");
@@ -41,6 +42,9 @@ public class Menu extends WebDriverCommon {
 	 */
 	public LoginPage logout() throws InterruptedException {
 		click(logout);
+		if (present(logout)) {
+			click(logout);
+		}
 		return new LoginPage(driver);
 	}
 

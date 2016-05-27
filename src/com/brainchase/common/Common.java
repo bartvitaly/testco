@@ -184,4 +184,15 @@ public class Common {
 		}
 	}
 
+	/**
+	 * This method is to return random Boolean
+	 * 
+	 * @return Boolean
+	 * 
+	 */
+	public static boolean getRandomBoolean() {
+		Random random = new Random();
+		return random.nextBoolean();
+	}
+
 }

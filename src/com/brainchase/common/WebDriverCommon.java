@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -70,7 +71,7 @@ public class WebDriverCommon {
 	 * 
 	 */
 	protected static void waitForPageLoaded(WebDriver driver) throws InterruptedException {
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
 		for (int i = 0; i < tabs.size(); i++) {
 			driver.switchTo().window(tabs.get(i));
@@ -180,11 +181,70 @@ public class WebDriverCommon {
 	 * @throws InterruptedException
 	 */
 	protected void click(Object obj) throws InterruptedException {
+		if (PropertiesUtils.get("browser").equals("ie")) {
+			clickEnter(obj);
+			return;
+		}
 		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
 			action.moveToElement(element).build().perform();
 			action.click(element).build().perform();
+			waitForPageLoaded(driver);
+		} catch (Exception e) {
+			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
+		}
+	}
+
+	/**
+	 * This method is to click on element using WebElement or By object
+	 * 
+	 * @param obj
+	 * @throws InterruptedException
+	 */
+	protected void clickNoEnter(Object obj) throws InterruptedException {
+		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		WebElement element = getElement(obj);
+		try {
+			action.moveToElement(element).build().perform();
+			action.click(element).build().perform();
+			waitForPageLoaded(driver);
+		} catch (Exception e) {
+			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
+		}
+	}
+
+	/**
+	 * This method is to click Enter on element using WebElement or By object
+	 * 
+	 * @param obj
+	 * @throws InterruptedException
+	 */
+	protected void clickEnter(Object obj) throws InterruptedException {
+		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		WebElement element = getElement(obj);
+		try {
+			action.moveToElement(element).build().perform();
+			element.sendKeys(Keys.RETURN);
+			waitForPageLoaded(driver);
+		} catch (Exception e) {
+			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
+		}
+	}
+
+	/**
+	 * This method is to click Enter on element using WebElement or By object
+	 * 
+	 * @param obj
+	 * @throws InterruptedException
+	 */
+	protected void clickEnterNoCookies(Object obj) throws InterruptedException {
+		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
+		WebElement element = getElement(obj);
+		try {
+			action.moveToElement(element).build().perform();
+			driver.manage().deleteAllCookies();
+			element.sendKeys(Keys.RETURN);
 			waitForPageLoaded(driver);
 		} catch (Exception e) {
 			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
@@ -209,6 +269,23 @@ public class WebDriverCommon {
 	}
 
 	/**
+	 * This method is to click and wait till another element sappears
+	 * 
+	 * @param driver
+	 * @param by
+	 * @param timeout
+	 * @throws InterruptedException
+	 * 
+	 */
+	protected void click_wait(By elementToClick, By elementToWait) throws InterruptedException {
+		int i = 0;
+		while (!present(elementToWait) && i < 10) {
+			click(elementToClick);
+			i++;
+		}
+	}
+
+	/**
 	 * This method is to type text into element using WebElement or By object
 	 * 
 	 * @param obj
@@ -220,7 +297,6 @@ public class WebDriverCommon {
 				"Filling a text '" + text + "' into the field '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
-			element.click();
 			element.clear();
 			element.sendKeys((String) text);
 		} catch (Exception e) {
@@ -364,7 +440,7 @@ public class WebDriverCommon {
 		if (!(attributeActual.contains((String) value)) && throwError) { // ||
 																			// ((String)
 																			// value).contains(attributeActual)
-			logger.error("Verify verification of attribute '" + attribute + "' failed. Expected value '" + value
+			logger.error("Verification of an attribute '" + attribute + "' failed. Expected value '" + value
 					+ "', actual is '" + attributeActual + "' for an object '" + obj + "'");
 			return false;
 		}

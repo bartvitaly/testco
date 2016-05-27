@@ -74,20 +74,21 @@ public class DemoTest extends Initialize {
 	 */
 	@DataProvider(parallel = true, name = "demoProvider")
 	public static User[][] user() throws IOException {
-		users = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student")
-				.get(0);
-		allUsers = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student")
-				.get(1);
+		users = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student").get(0);
+		allUsers = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student").get(1);
 		return User.getUsers(users, PropertiesUtils.getInt("students_number"));
 	}
 
 	@Test(groups = { "demo" })
 	public void gradeAllAssignments() throws Exception {
 		// Grade all assignments
-		gradeNumber = 30;
-		teacher();
-		supervisor();
 		gradeNumber = PropertiesUtils.getInt("grade_number");
+		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
+				.get(0).get(0);
+		User supervisor = CsvFileReader
+				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
+		clear(teacher);
+		clear(supervisor);
 	}
 
 	@Test(groups = { "demo" }, dataProvider = "demoProvider", dependsOnMethods = { "gradeAllAssignments" })
@@ -95,6 +96,7 @@ public class DemoTest extends Initialize {
 		final Student student = new Student(user.login, user.name, user.password, user.type);
 
 		logger.info("Open login page, fill username and password and click login");
+		driver.get().manage().deleteAllCookies();
 		DashboardStudentPage dashboardPage = (DashboardStudentPage) login(user);
 
 		logger.info("A student submits challenges");
@@ -146,6 +148,15 @@ public class DemoTest extends Initialize {
 
 		// Write teacher transactions to a file
 		transactionsSupervisor = supervisor.getTransactions();
+	}
+
+	public void clear(User user) throws Exception {
+		// Go to Dashboard page
+		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(user);
+
+		// Grade an assignment
+		dashboardPage.grade(user, PropertiesUtils.getInt("grade_number"));
+		dashboardPage.logout();
 	}
 
 	@AfterMethod(groups = { "demo" })

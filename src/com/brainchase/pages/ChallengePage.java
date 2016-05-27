@@ -51,7 +51,7 @@ public class ChallengePage extends Menu {
 	 */
 	public void submitChallenge(Student student, String challengeType) throws InterruptedException {
 		logger.info("Submitting challenge.");
-		
+
 		// Get transaction_id, if it is not exist then it will be assumed that a
 		// challenge is already submitted
 		Challenge challenge = student.challenges.get(challengeType);
@@ -67,18 +67,17 @@ public class ChallengePage extends Menu {
 			switch (challengeType) {
 			case "art":
 				type(externalLink, challenge.externalLink);
-				type(response, challenge.response);
+				type(response, challenge.answer);
 				break;
 			case "engineering":
 				type(externalLink, challenge.externalLink);
-				type(response, challenge.response);
+				type(response, challenge.answer);
 				break;
 			case "writing":
 				type(response, challenge.response);
 				break;
 			}
 			click(submit);
-			checkAttribute(alert, "text", "Your submission has been saved.", true);
 		}
 
 		// Returning back to dashboard

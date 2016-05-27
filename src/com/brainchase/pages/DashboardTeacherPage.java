@@ -116,27 +116,37 @@ public class DashboardTeacherPage extends Menu {
 	 * 
 	 */
 	private Boolean getNewAssignmentToGrade() throws InterruptedException {
-		if (!present(gradeIt)) {
+		super.driver.navigate().refresh();
+		if (present(gradeIt)) {
+			return true;
+		}
+		if (getAttribute(getNewAssignment, "class").contains("disabled")
+				&& getAttribute(getNewWritingAssignment, "class").contains("disabled")) {
+			return false;
+		}
+
+		if (!getAttribute(getNewAssignment, "class").contains("disabled")) {
 			click(getNewAssignment);
-			if (!present(gradeIt)) {
-				click(getNewWritingAssignment);
-				if (!present(gradeIt)) {
-					logger.info("No assignments to grade.");
-					return false;
-				} else {
-					String challengeTypeToGrade = getAttribute(challengeType, "text");
-					if (!challengeTypeToGrade.equalsIgnoreCase("writing")) {
-						logger.error(
-								"A non writing assignment is shown after clicking Get New Writing Assignment to Review.");
-					}
-				}
-			} else {
-				if (getAttribute(challengeType, "text").equalsIgnoreCase("writing")) {
-					logger.error("A writing assignment is shown after clicking Get New Assignment to Review.");
-				}
+			String challengeTypeToGrade = getAttribute(challengeType, "text");
+			if (challengeTypeToGrade.equalsIgnoreCase("writing")) {
+				logger.error("A writing assignment is shown after clicking Get New Assignment to Review.");
+			}
+			if (present(gradeIt)) {
+				return true;
 			}
 		}
-		return true;
+
+		if (!getAttribute(getNewWritingAssignment, "class").contains("disabled")) {
+			click(getNewWritingAssignment);
+			String challengeTypeToGrade = getAttribute(challengeType, "text");
+			if (!challengeTypeToGrade.equalsIgnoreCase("writing")) {
+				logger.error("A non writing assignment is shown after clicking Get New Writing Assignment to Review.");
+			}
+			if (present(gradeIt)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
