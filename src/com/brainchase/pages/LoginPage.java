@@ -28,7 +28,7 @@ public class LoginPage extends Menu {
 	public LoginPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		logger.info("Opened Login page.");
-		
+
 		if (present(logout)) {
 			click(logout);
 		}
@@ -43,23 +43,18 @@ public class LoginPage extends Menu {
 	 */
 	public Object login(User user) throws InterruptedException {
 		logger.info("Fill username '" + user.name + "' and password '" + user.password + "' and click login");
-		type(username, user.login);
-		type(password, user.password);
-		clickEnter(password);
-//		click(submit);
-		
-		if (!present(logout)) {
+		int i = 0;
+		while (!present(logout) && i < 10) {
 			type(username, user.login);
 			type(password, user.password);
-			clickEnter(password);
-			// click(submit);
+			click(submit);
 		}
-		
+
 		switch (user.type) {
-			case "teacher":
-				return new DashboardTeacherPage(driver);
-			case "supervisor":
-				return new DashboardSupervisorPage(driver);
+		case "teacher":
+			return new DashboardTeacherPage(driver);
+		case "supervisor":
+			return new DashboardSupervisorPage(driver);
 		}
 		return new DashboardStudentPage(driver);
 	}

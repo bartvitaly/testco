@@ -21,8 +21,6 @@ import com.brainchase.common.PropertiesUtils;
 
 /**
  * 
- * This class is to initialise WebDriver
- * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -31,10 +29,6 @@ public class Initialize {
 	protected static ThreadLocal<WebDriver> driver = new ThreadLocal<WebDriver>();
 	final static Logger logger = Logger.getLogger(Initialize.class);
 
-	/**
-	 * This method sets Appender
-	 * 
-	 */
 	@BeforeGroups(groups = { "demo" })
 	public void setAppender() {
 		BasicConfigurator.configure();
@@ -42,12 +36,6 @@ public class Initialize {
 		Logger.getRootLogger().setLevel(Level.toLevel(logLevel));
 	}
 
-	/**
-	 * This method initialises WebDriver
-	 * 
-	 * @return WebDriver
-	 * 
-	 */
 	@BeforeMethod(groups = { "demo" })
 	public WebDriver init() {
 		String browser = PropertiesUtils.get("browser");
@@ -104,11 +92,9 @@ public class Initialize {
 	void start_ie() {
 		DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
 		capabilities.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
-		capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
-		capabilities.setCapability(InternetExplorerDriver.ENABLE_PERSISTENT_HOVERING, true);
-		capabilities.setCapability(InternetExplorerDriver.IE_SWITCHES, "-private");
-		capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-		capabilities.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, false);
+		capabilities.setCapability("ie.forceCreateProcessApi", true);
+		capabilities.setCapability("ie.browserCommandLineSwitches", "-private");
+		capabilities.setCapability("ie.ensureCleanSession", true);
 		System.setProperty("webdriver.ie.driver", (new File("drivers/IEDriverServer.exe")).getAbsolutePath());
 		driver.set(new InternetExplorerDriver(capabilities));
 	}

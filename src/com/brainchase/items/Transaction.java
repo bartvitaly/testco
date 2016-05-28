@@ -7,18 +7,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
 import com.brainchase.common.Common;
 import com.brainchase.common.CsvFileReader;
-import com.brainchase.common.PropertiesUtils;
 import com.brainchase.pages.DashboardTeacherPage;
 
 /**
- * 
- * This class defines Transaction entity
  * 
  * @author vbartashchuk@testco.com
  *
@@ -46,36 +42,8 @@ public class Transaction {
 	 * @param transactionNew
 	 * @return
 	 */
-	public synchronized static HashMap<String, HashMap<String, String>> addTransactions(
+	public static HashMap<String, HashMap<String, String>> addTransactions(
 			HashMap<String, HashMap<String, String>> transactionsOld,
-			HashMap<String, HashMap<String, String>> transactionsNew) {
-
-		// Iterate over challenges
-		Iterator<Entry<String, HashMap<String, String>>> itTypes = transactionsNew.entrySet().iterator();
-		while (itTypes.hasNext()) {
-			Map.Entry<String, HashMap<String, String>> types = (Map.Entry<String, HashMap<String, String>>) itTypes
-					.next();
-
-			// Iterate over students
-			Iterator<Entry<String, String>> itStudents = types.getValue().entrySet().iterator();
-			while (itStudents.hasNext()) {
-				Map.Entry<String, String> students = (Map.Entry<String, String>) itStudents.next();
-				transactionsOld.get(types.getKey()).put(students.getKey(), students.getValue());
-			}
-		}
-
-		return transactionsOld;
-	}
-
-	/**
-	 * This method is to add a new transaction into existing HashMap
-	 * 
-	 * @param transactionsOld
-	 * @param transactionNew
-	 * @return
-	 */
-	public static ConcurrentHashMap<String, HashMap<String, String>> addTransactions(
-			ConcurrentHashMap<String, HashMap<String, String>> transactionsOld,
 			HashMap<String, HashMap<String, String>> transactionsNew) {
 
 		// Iterate over challenges
@@ -102,20 +70,6 @@ public class Transaction {
 	 */
 	public static HashMap<String, HashMap<String, String>> getTransactionsHashMap() {
 		HashMap<String, HashMap<String, String>> transactions = new HashMap<String, HashMap<String, String>>();
-		for (int i = 0; i < challenges.size(); i++) {
-			transactions.put(challenges.get(i).type, new HashMap<String, String>());
-		}
-
-		return transactions;
-	}
-
-	/**
-	 * This method is to create transactions HashMap
-	 * 
-	 * @param transactions
-	 */
-	public static ConcurrentHashMap<String, HashMap<String, String>> getTransactionsConcurrentHashMap() {
-		ConcurrentHashMap<String, HashMap<String, String>> transactions = new ConcurrentHashMap<String, HashMap<String, String>>();
 		for (int i = 0; i < challenges.size(); i++) {
 			transactions.put(challenges.get(i).type, new HashMap<String, String>());
 		}
@@ -210,7 +164,7 @@ public class Transaction {
 	}
 
 	/**
-	 * This method is to compare transaction vs dashboard
+	 * This method is to compare transactions
 	 * 
 	 * @param transaction
 	 * @param transaction2
@@ -360,63 +314,6 @@ public class Transaction {
 		}
 
 		return toPrint;
-	}
-
-	/**
-	 * This method is to create data type readable for TestNG data provider
-	 * 
-	 * @param users
-	 * @param size
-	 * 
-	 */
-	public static Transaction[][] getTransactions(HashMap<String, HashMap<String, String>> transactions)
-			throws IOException {
-		Transaction[][] dataProviderArray = new Transaction[PropertiesUtils.getInt("grade_parallel")][1];
-
-		return dataProviderArray;
-	}
-
-	/**
-	 * This method is to create data type readable for TestNG data provider
-	 * 
-	 * @param users
-	 * @param size
-	 * 
-	 */
-	public static Transaction[][] getTransactions(ConcurrentHashMap<String, HashMap<String, String>> transactions)
-			throws IOException {
-		int gradeParallel = 1 + PropertiesUtils.getInt("students_number") * transactions.size() / 2;
-		if (gradeParallel > PropertiesUtils.getInt("grade_parallel")) {
-			gradeParallel = PropertiesUtils.getInt("grade_parallel");
-		}
-		Transaction[][] dataProviderArray = new Transaction[gradeParallel][1];
-
-		return dataProviderArray;
-	}
-
-	/**
-	 * This method is to remove a transaction
-	 * 
-	 * @param transactions
-	 * 
-	 */
-	public synchronized static Boolean removeTransaction(
-			ConcurrentHashMap<String, HashMap<String, String>> transactions, String challengeTypeToGrade,
-			String studentToGrade) {
-
-		try {
-			synchronized (transactions) {
-				synchronized (transactions.get(challengeTypeToGrade)) {
-					synchronized (transactions.get(challengeTypeToGrade).get(studentToGrade)) {
-						transactions.get(challengeTypeToGrade).remove(studentToGrade);
-					}
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-
 	}
 
 }

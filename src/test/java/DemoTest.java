@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -48,16 +47,11 @@ public class DemoTest extends Initialize {
 
 	ArrayList<HashMap<String, HashMap<String, String>>> transactions = new ArrayList<HashMap<String, HashMap<String, String>>>();
 
-	static HashMap<String, HashMap<String, String>> transactionsStudent = Transaction.getTransactionsHashMap();
+	HashMap<String, HashMap<String, String>> transactionsStudent = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> dashboardTeacher = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> transactionsTeacher = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> dashboardSupervisor = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> transactionsSupervisor = Transaction.getTransactionsHashMap();
-
-	static ConcurrentHashMap<String, HashMap<String, String>> transactionsCopyTeacher = Transaction
-			.getTransactionsConcurrentHashMap();
-	static ConcurrentHashMap<String, HashMap<String, String>> transactionsCopySupervisor = Transaction
-			.getTransactionsConcurrentHashMap();
 
 	@BeforeMethod(groups = { "demo" })
 	public void setUp() throws Exception {
@@ -81,17 +75,6 @@ public class DemoTest extends Initialize {
 		return User.getUsers(users, PropertiesUtils.getInt("students_number"));
 	}
 
-	/**
-	 * This is data provider for running the same test with different data
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	@DataProvider(parallel = true, name = "transactionsProvider")
-	public static Transaction[][] transactions() throws IOException {
-		return Transaction.getTransactions(transactionsStudent);
-	}
-
 	@Test(groups = { "demo" })
 	public void gradeAllAssignments() throws Exception {
 		// Grade all assignments
@@ -100,7 +83,6 @@ public class DemoTest extends Initialize {
 				.get(0).get(0);
 		User supervisor = CsvFileReader
 				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
-
 		clear(teacher);
 		clear(supervisor);
 	}
@@ -109,7 +91,8 @@ public class DemoTest extends Initialize {
 	public void student(User user) throws Exception {
 		final Student student = new Student(user.login, user.name, user.password, user.type);
 
-		logger.info("Open login page, fill credentials and login");
+		logger.info("Open login page, fill username and password and click login");
+		driver.get().manage().deleteAllCookies();
 		DashboardStudentPage dashboardPage = (DashboardStudentPage) login(user);
 
 		logger.info("A student submits challenges");
@@ -118,47 +101,51 @@ public class DemoTest extends Initialize {
 		logger.info("A student logs out");
 		dashboardPage.logout();
 
-		transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
-		transactionsCopyTeacher = Transaction.addTransactions(transactionsCopyTeacher, student.getTransactions());
-		transactionsCopySupervisor = Transaction.addTransactions(transactionsCopySupervisor, student.getTransactions());
+		synchronized (transactionsStudent) {
+			transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
+		}
 	}
 
-	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "student" })
-	public void teacher(Transaction transaction) throws Exception {
+	@Test(groups = { "demo" }, dependsOnMethods = { "student" })
+	public void teacher() throws Exception {
+		// Get a teacher data from file
 		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
 				.get(0).get(0);
+
 		// Go to Dashboard page
 		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
 
 		// Check transactions are shown on Dashboard
 		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardTeacher = Transaction.addTransactions(dashboardTeacher, dashboardPage.allAssignments);
+		dashboardTeacher = dashboardPage.allAssignments;
 
 		// Grade an assignment
-		dashboardPage.grade(teacher, transactionsCopyTeacher);
+		dashboardPage.grade(teacher, gradeNumber);
 		dashboardPage.logout();
 
 		// Write teacher transactions to a file
-		transactionsTeacher = Transaction.addTransactions(transactionsTeacher, teacher.getTransactions());
+		transactionsTeacher = teacher.getTransactions();
 	}
 
-	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "teacher" })
-	public void supervisor(Transaction transaction) throws Exception {
+	@Test(groups = { "demo" }, dependsOnMethods = { "teacher" })
+	public void supervisor() throws Exception {
+		// Get a teacher data from file
 		User supervisor = CsvFileReader
 				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
+
 		// Go to Dashboard page
 		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) login(supervisor);
 
 		// Check transactions are shown on Dashboard
 		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardSupervisor = Transaction.addTransactions(dashboardSupervisor, dashboardPage.allAssignments);
+		dashboardSupervisor = dashboardPage.allAssignments;
 
 		// Grade an assignment
-		dashboardPage.grade(supervisor, transactionsCopySupervisor);
+		dashboardPage.grade(supervisor, gradeNumber);
 		dashboardPage.logout();
 
 		// Write teacher transactions to a file
-		transactionsSupervisor = Transaction.addTransactions(transactionsSupervisor, supervisor.getTransactions());
+		transactionsSupervisor = supervisor.getTransactions();
 	}
 
 	public void clear(User user) throws Exception {
@@ -183,12 +170,12 @@ public class DemoTest extends Initialize {
 	@AfterGroups(groups = { "demo" })
 	public void results() throws IOException {
 		// Compare students' and teacher's transactions
-		HashMap<String, HashMap<String, HashMap<String, String>>> transactionsToCompare = new HashMap<String, HashMap<String, HashMap<String, String>>>();
-		transactionsToCompare.put("transactionsStudent", transactionsStudent);
-		transactionsToCompare.put("dashboardTeacher", dashboardTeacher);
-		transactionsToCompare.put("transactionsTeacher", transactionsTeacher);
-		transactionsToCompare.put("dashboardSupervisor", dashboardSupervisor);
-		transactionsToCompare.put("transactionsSupervisor", transactionsSupervisor);
+		ArrayList<HashMap<String, HashMap<String, String>>> transactionsToCompare = new ArrayList<HashMap<String, HashMap<String, String>>>();
+		transactionsToCompare.add(transactionsStudent);
+		transactionsToCompare.add(dashboardTeacher);
+		transactionsToCompare.add(transactionsTeacher);
+		transactionsToCompare.add(dashboardSupervisor);
+		transactionsToCompare.add(transactionsSupervisor);
 
 		HTMLBuilder.create(transactionsToCompare, Common.canonicalPath() + File.separator + "transactions.html");
 	}

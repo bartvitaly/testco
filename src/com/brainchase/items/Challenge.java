@@ -4,8 +4,6 @@ import com.brainchase.common.Common;
 
 /**
  * 
- * This class defines Challenge object
- * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -14,7 +12,7 @@ public class Challenge {
 	public String type, externalLink, response, image, answer;
 	
 	/**
-	 * This is a constructor of the class
+	 * This is constructor of the class
 	 * 
 	 * @param type
 	 * @param externalLink
@@ -32,7 +30,7 @@ public class Challenge {
 	}	
 	
 	/**
-	 * This is a constructor of the class
+	 * This is constructor of the class
 	 * 
 	 * @param type
 	 * 

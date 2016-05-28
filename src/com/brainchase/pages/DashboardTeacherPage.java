@@ -1,19 +1,20 @@
 package com.brainchase.pages;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.brainchase.common.Common;
 import com.brainchase.common.CsvFileReader;
-import com.brainchase.common.PropertiesUtils;
+import com.brainchase.items.Challenge;
 import com.brainchase.items.Transaction;
 import com.brainchase.items.User;
 
@@ -103,33 +104,6 @@ public class DashboardTeacherPage extends Menu {
 			if (user.getTransactions().containsKey(type)) {
 				user.getTransactions().get(type).put(name, gradingPage.transactionId);
 			}
-		}
-	}
-
-	/**
-	 * This method is to grade an assignment
-	 * 
-	 * @param user
-	 * @param transactions
-	 * @throws InterruptedException
-	 * 
-	 */
-	public void grade(User user, ConcurrentHashMap<String, HashMap<String, String>> transactions)
-			throws InterruptedException {
-		int i = 0;
-		int maxIterations = PropertiesUtils.getInt("grade_number");
-		while (getNewAssignmentToGrade() && i < maxIterations) {
-			String challengeTypeToGrade = getAttribute(challengeType, "text").toLowerCase();
-			String studentToGrade = getText(studentName);
-			studentToGrade = studentToGrade.substring(0, studentToGrade.indexOf(" "));
-
-			Boolean transactionRemoved = Transaction.removeTransaction(transactions, challengeTypeToGrade,
-					studentToGrade);
-
-			if (transactionRemoved) {
-				grade(user, 1);
-			}
-			i++;
 		}
 	}
 

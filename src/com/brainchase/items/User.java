@@ -48,9 +48,7 @@ public class User {
 				usersIterator = 0;
 			}
 			dataProviderArray[dataProviderIterator][0] = users.get(usersIterator);
-			if (users.get(usersIterator).type.equals("student")) {
-				usersIterator++;
-			}
+			usersIterator++;
 		}
 
 		return dataProviderArray;

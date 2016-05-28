@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
 
 /**
  * 
- * This class contains methods to work with files and data structures
- * 
  * @author vbartashchuk@testco.com
  *
  */

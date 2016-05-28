@@ -11,7 +11,7 @@ import org.openqa.selenium.WebDriver;
 import com.brainchase.items.Student;
 
 /**
- * This class describes a student's dashboard page of the web site and the page
+ * This class describes a student's dashboard page of the web site and page
  * elements
  * 
  * @author vbartashchuk@testco.com
@@ -26,16 +26,19 @@ public class DashboardStudentPage extends Menu {
 
 	static By welcomePopup = By.cssSelector("[style*='visible'] .joyride-close-tip");
 
-	private static By introductory = By.cssSelector("[id=Introductory1]");
+	private static By introductory = By.cssSelector(".intro-video a");
 	private static By videoClose = By.cssSelector(".fancybox-close");
 	private static By weekContainer = By.cssSelector(".week-container");
 
+	private static By artChallenge = By.cssSelector("[style*='art']");
+	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
 	private static By engineeringChallenge = By.cssSelector("[style*='engineering']");
 	private static By mathChallenge = By.cssSelector("[style*='math']");
 	private static By readingChallenge = By.cssSelector("[style*='reading']");
 	private static By writingChallenge = By.cssSelector("[style*='writing']");
-	private static By artChallenge = By.cssSelector("[style*='art']");
-	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
+
+	// Challenge page
+	private static By response = By.cssSelector("[id=edit-student-input]");
 
 	/**
 	 * This is constructor that sets a web driver for the page object
@@ -47,9 +50,12 @@ public class DashboardStudentPage extends Menu {
 		super(driver);
 		logger.info("Opened Student's Dashboard page");
 
-		if (present(welcomePopup)) {
-			click(welcomePopup);
-		}
+		super.driver.navigate().refresh();
+		System.out.println("refreshed first entry into DashboardStudentPage constructor");
+		// waitForPageLoaded(this.driver);
+		// if (present(welcomePopup)) {
+		// click(welcomePopup);
+		// }
 	}
 
 	/**
@@ -63,14 +69,30 @@ public class DashboardStudentPage extends Menu {
 		// If Challenges are not enabled click introductory video and close it
 		// then
 		String challengeStatus = getAttribute(engineeringChallenge, "class");
-		if (challengeStatus.equals("")) {
+		int i = 0;
+		System.out.println("openChallenge checking three challenges");
+		while (!challengeStatus.equals(CHALLENGE_ACTIVE) && !challengeStatus.equals(CHALLENGE_SUBMITTED)
+				&& !challengeStatus.equals(CHALLENGE_GRADED) && i < 10) {
+			System.out.println("entered second whileopenChallenge checking three challenges");
 			click(introductory);
 			click(videoClose);
-			super.driver.navigate().refresh();
+			challengeStatus = getAttribute(engineeringChallenge, "class");
+			i++;
 		}
 
 		// Open a challenge
-		click(getChallengeElement(challengeType));
+		i = 0;
+		while (!present(response) && i < 10) {
+			click(getChallengeElement(challengeType));
+			// if (PropertiesUtils.get("browser").equals("ie")) {
+			// driver.get(getAttribute(getChallengeElement(challengeType),
+			// "href"));
+			// } else {
+			// click(getChallengeElement(challengeType));
+			// }
+			waitForPageLoaded(driver);
+			i++;
+		}
 
 		return new ChallengePage(driver);
 	}
@@ -83,15 +105,21 @@ public class DashboardStudentPage extends Menu {
 	 * @throws IOException
 	 */
 	public void submitChallenges(Student student) throws InterruptedException, IOException {
+		System.out.println("entered submitChallenges");
 		for (Map.Entry<String, HashMap<String, String>> transactions : student.getTransactions().entrySet()) {
+			System.out.println("entered submitChallenges for");
 			String challengeType = transactions.getKey();
 			String challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
-			if (challengeStatus.equals(CHALLENGE_SUBMITTED) || challengeStatus.equals(CHALLENGE_GRADED)) {
-				// student.getTransactions().get(challengeType).put(student.name,
-				// "");
-			} else {
+			if (!challengeStatus.equals(CHALLENGE_SUBMITTED) && !challengeStatus.equals(CHALLENGE_GRADED)) {
+				System.out.println("entered submitChallenges if CHALLENGE_SUBMITTED CHALLENGE_GRADED");
 				ChallengePage challengePage = openChallenge(challengeType);
 				challengePage.submitChallenge(student, challengeType);
+				challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
+				if (!challengeStatus.equals(CHALLENGE_SUBMITTED) && !challengeStatus.equals(CHALLENGE_GRADED)) {
+					System.out.println("entered second submitChallenges if CHALLENGE_SUBMITTED CHALLENGE_GRADED");
+					challengePage = openChallenge(challengeType);
+					challengePage.submitChallenge(student, challengeType);
+				}
 			}
 		}
 	}

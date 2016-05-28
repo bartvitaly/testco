@@ -4,11 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -27,7 +23,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * 
- * This class contains WebDriver methods
+ * This class
  * 
  * @author vbartashchuk@testco.com
  *
@@ -75,13 +71,7 @@ public class WebDriverCommon {
 	 * 
 	 */
 	protected static void waitForPageLoaded(WebDriver driver) throws InterruptedException {
-		// Thread.sleep(2000);
-
-		// ExecutorService es = Executors.newFixedThreadPool(1);
-		// Future<?> future = es.submit(new Runnable() {
-		//
-		// @Override
-		// public void run() {
+		Thread.sleep(2000);
 		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
 		for (int i = 0; i < tabs.size(); i++) {
 			driver.switchTo().window(tabs.get(i));
@@ -98,18 +88,7 @@ public class WebDriverCommon {
 				Assert.assertFalse("Timeout waiting for Page Load Request to complete.", true);
 			}
 		}
-
 	}
-
-	// });
-	//
-	// try {
-	// future.get(PropertiesUtils.getInt("timeout"), TimeUnit.SECONDS);
-	// } catch (Exception e) {
-	// future.cancel(true);
-	// }
-
-	// }
 
 	/**
 	 * This method is to wait till an element appears
@@ -119,6 +98,7 @@ public class WebDriverCommon {
 	 * @param timeout
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	protected static WebElement waitForElement(WebDriver driver, final By by, int timeout) {
 		org.openqa.selenium.support.ui.Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
 
@@ -201,29 +181,15 @@ public class WebDriverCommon {
 	 * @throws InterruptedException
 	 */
 	protected void click(Object obj) throws InterruptedException {
+		// if (PropertiesUtils.get("browser").equals("ie")) {
+		// clickDouble(obj);
+		// return;
+		// }
 		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
 			action.moveToElement(element).build().perform();
 			action.click(element).build().perform();
-			waitForPageLoaded(driver);
-		} catch (Exception e) {
-			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
-		}
-	}
-
-	/**
-	 * This method is to click Enter on element using WebElement or By object
-	 * 
-	 * @param obj
-	 * @throws InterruptedException
-	 */
-	protected void clickEnter(Object obj) throws InterruptedException {
-		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
-		WebElement element = getElement(obj);
-		try {
-			action.moveToElement(element).build().perform();
-			element.sendKeys(Keys.RETURN);
 			waitForPageLoaded(driver);
 		} catch (Exception e) {
 			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
@@ -248,18 +214,34 @@ public class WebDriverCommon {
 	}
 
 	/**
+	 * This method is to click and wait till another element sappears
+	 * 
+	 * @param driver
+	 * @param by
+	 * @param timeout
+	 * @throws InterruptedException
+	 * 
+	 */
+	protected void click_wait(By elementToClick, By elementToWait) throws InterruptedException {
+		int i = 0;
+		while (!present(elementToWait) && i < 10) {
+			click(elementToClick);
+			i++;
+		}
+	}
+
+	/**
 	 * This method is to type text into element using WebElement or By object
 	 * 
 	 * @param obj
 	 * @param text
 	 */
-	protected synchronized void type(Object obj, Object text) {
+	protected void type(Object obj, Object text) {
 		text = String.valueOf(text);
 		logger.debug(
 				"Filling a text '" + text + "' into the field '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
-			element.click();
 			element.clear();
 			element.sendKeys((String) text);
 		} catch (Exception e) {
@@ -292,9 +274,6 @@ public class WebDriverCommon {
 	protected String getText(Object obj) {
 		logger.debug("Getting text from element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
-		if (element == null) {
-			return "";
-		}
 		return element.getText().toString();
 	}
 
@@ -395,9 +374,6 @@ public class WebDriverCommon {
 	 * @return Boolean
 	 */
 	protected boolean checkAttribute(Object obj, String attribute, Object value, boolean throwError) {
-		if (obj == null) {
-			return false;
-		}
 		value = String.valueOf(value);
 		logger.debug(
 				"Verify an attribute '" + attribute + "' equals value '" + value + "' for an object '" + obj + "'");
@@ -409,7 +385,7 @@ public class WebDriverCommon {
 		if (!(attributeActual.contains((String) value)) && throwError) { // ||
 																			// ((String)
 																			// value).contains(attributeActual)
-			logger.error("Verify verification of attribute '" + attribute + "' failed. Expected value '" + value
+			logger.error("Verification of an attribute '" + attribute + "' failed. Expected value '" + value
 					+ "', actual is '" + attributeActual + "' for an object '" + obj + "'");
 			return false;
 		}
