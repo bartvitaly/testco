@@ -181,70 +181,15 @@ public class WebDriverCommon {
 	 * @throws InterruptedException
 	 */
 	protected void click(Object obj) throws InterruptedException {
-		if (PropertiesUtils.get("browser").equals("ie")) {
-			clickEnter(obj);
-			return;
-		}
+		// if (PropertiesUtils.get("browser").equals("ie")) {
+		// clickDouble(obj);
+		// return;
+		// }
 		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {
 			action.moveToElement(element).build().perform();
 			action.click(element).build().perform();
-			waitForPageLoaded(driver);
-		} catch (Exception e) {
-			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
-		}
-	}
-
-	/**
-	 * This method is to click on element using WebElement or By object
-	 * 
-	 * @param obj
-	 * @throws InterruptedException
-	 */
-	protected void clickNoEnter(Object obj) throws InterruptedException {
-		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
-		WebElement element = getElement(obj);
-		try {
-			action.moveToElement(element).build().perform();
-			action.click(element).build().perform();
-			waitForPageLoaded(driver);
-		} catch (Exception e) {
-			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
-		}
-	}
-
-	/**
-	 * This method is to click Enter on element using WebElement or By object
-	 * 
-	 * @param obj
-	 * @throws InterruptedException
-	 */
-	protected void clickEnter(Object obj) throws InterruptedException {
-		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
-		WebElement element = getElement(obj);
-		try {
-			action.moveToElement(element).build().perform();
-			element.sendKeys(Keys.RETURN);
-			waitForPageLoaded(driver);
-		} catch (Exception e) {
-			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");
-		}
-	}
-
-	/**
-	 * This method is to click Enter on element using WebElement or By object
-	 * 
-	 * @param obj
-	 * @throws InterruptedException
-	 */
-	protected void clickEnterNoCookies(Object obj) throws InterruptedException {
-		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
-		WebElement element = getElement(obj);
-		try {
-			action.moveToElement(element).build().perform();
-			driver.manage().deleteAllCookies();
-			element.sendKeys(Keys.RETURN);
 			waitForPageLoaded(driver);
 		} catch (Exception e) {
 			logger.error("An element '" + obj + "' was not clicked on page '" + driver.getCurrentUrl() + "'");

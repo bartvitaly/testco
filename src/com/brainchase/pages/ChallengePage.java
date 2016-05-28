@@ -64,24 +64,34 @@ public class ChallengePage extends Menu {
 			student.getTransactions().get(challengeType).put(student.name, getAttribute(transactionIdElement, "value"));
 
 			// Complete a challenge
-			switch (challengeType) {
-			case "art":
-				type(externalLink, challenge.externalLink);
-				type(response, challenge.answer);
-				break;
-			case "engineering":
-				type(externalLink, challenge.externalLink);
-				type(response, challenge.answer);
-				break;
-			case "writing":
-				type(response, challenge.response);
-				break;
-			}
+			fillChallengeFields(challenge, challengeType);
 			click(submit);
 		}
 
 		// Returning back to dashboard
 		click(backToDashboard);
+	}
+
+	/**
+	 * This method logs in a user
+	 * 
+	 * @param challenge
+	 * @throws InterruptedException
+	 */
+	public void fillChallengeFields(Challenge challenge, String challengeType) throws InterruptedException {
+		switch (challengeType) {
+		case "art":
+			type(externalLink, challenge.externalLink);
+			type(response, challenge.answer);
+			break;
+		case "engineering":
+			type(externalLink, challenge.externalLink);
+			type(response, challenge.answer);
+			break;
+		case "writing":
+			type(response, challenge.response);
+			break;
+		}
 	}
 
 }

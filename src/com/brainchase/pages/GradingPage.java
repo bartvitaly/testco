@@ -41,13 +41,13 @@ public class GradingPage extends Menu {
 	 * 
 	 * @param User
 	 * @return
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public void grade(Boolean accept, String commentsText) throws InterruptedException {
 		if (accept) {
-			clickNoEnter(accepted);
+			click(accepted);
 		} else {
-			clickNoEnter(needsWork);
+			click(needsWork);
 		}
 
 		type(comments, commentsText);

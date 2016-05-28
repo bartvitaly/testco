@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-import com.brainchase.common.WebDriverCommon;
 import com.brainchase.items.User;
 
 /**
@@ -48,7 +47,7 @@ public class LoginPage extends Menu {
 		while (!present(logout) && i < 10) {
 			type(username, user.login);
 			type(password, user.password);
-			clickEnter(password);
+			click(submit);
 		}
 
 		switch (user.type) {

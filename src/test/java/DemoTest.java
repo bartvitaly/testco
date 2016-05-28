@@ -7,10 +7,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -22,7 +20,6 @@ import com.brainchase.common.PropertiesUtils;
 import com.brainchase.common.SoftAssert;
 import com.brainchase.common.TestNGReportAppender;
 import com.brainchase.common.WebDriverCommon;
-import com.brainchase.items.Challenge;
 import com.brainchase.items.Student;
 import com.brainchase.items.Transaction;
 import com.brainchase.items.User;
@@ -30,7 +27,6 @@ import com.brainchase.pages.DashboardStudentPage;
 import com.brainchase.pages.DashboardSupervisorPage;
 import com.brainchase.pages.DashboardTeacherPage;
 import com.brainchase.pages.LoginPage;
-import com.thoughtworks.selenium.webdriven.commands.Click;
 
 /**
  * This class contains a test demo
@@ -105,7 +101,9 @@ public class DemoTest extends Initialize {
 		logger.info("A student logs out");
 		dashboardPage.logout();
 
-		transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
+		synchronized (transactionsStudent) {
+			transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
+		}
 	}
 
 	@Test(groups = { "demo" }, dependsOnMethods = { "student" })
