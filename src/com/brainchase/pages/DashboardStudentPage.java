@@ -49,13 +49,7 @@ public class DashboardStudentPage extends Menu {
 	public DashboardStudentPage(WebDriver driver) throws InterruptedException {
 		super(driver);
 		logger.info("Opened Student's Dashboard page");
-
 		super.driver.navigate().refresh();
-		System.out.println("refreshed first entry into DashboardStudentPage constructor");
-		// waitForPageLoaded(this.driver);
-		// if (present(welcomePopup)) {
-		// click(welcomePopup);
-		// }
 	}
 
 	/**
@@ -70,10 +64,9 @@ public class DashboardStudentPage extends Menu {
 		// then
 		String challengeStatus = getAttribute(engineeringChallenge, "class");
 		int i = 0;
-		System.out.println("openChallenge checking three challenges");
+		logger.info("Opened Challenge");
 		while (!challengeStatus.equals(CHALLENGE_ACTIVE) && !challengeStatus.equals(CHALLENGE_SUBMITTED)
 				&& !challengeStatus.equals(CHALLENGE_GRADED) && i < 10) {
-			System.out.println("entered second whileopenChallenge checking three challenges");
 			click(introductory);
 			click(videoClose);
 			challengeStatus = getAttribute(engineeringChallenge, "class");
@@ -84,12 +77,6 @@ public class DashboardStudentPage extends Menu {
 		i = 0;
 		while (!present(response) && i < 10) {
 			click(getChallengeElement(challengeType));
-			// if (PropertiesUtils.get("browser").equals("ie")) {
-			// driver.get(getAttribute(getChallengeElement(challengeType),
-			// "href"));
-			// } else {
-			// click(getChallengeElement(challengeType));
-			// }
 			waitForPageLoaded(driver);
 			i++;
 		}
@@ -105,18 +92,14 @@ public class DashboardStudentPage extends Menu {
 	 * @throws IOException
 	 */
 	public void submitChallenges(Student student) throws InterruptedException, IOException {
-		System.out.println("entered submitChallenges");
 		for (Map.Entry<String, HashMap<String, String>> transactions : student.getTransactions().entrySet()) {
-			System.out.println("entered submitChallenges for");
 			String challengeType = transactions.getKey();
 			String challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
 			if (!challengeStatus.equals(CHALLENGE_SUBMITTED) && !challengeStatus.equals(CHALLENGE_GRADED)) {
-				System.out.println("entered submitChallenges if CHALLENGE_SUBMITTED CHALLENGE_GRADED");
 				ChallengePage challengePage = openChallenge(challengeType);
 				challengePage.submitChallenge(student, challengeType);
 				challengeStatus = getAttribute(getChallengeElement(challengeType), "class");
 				if (!challengeStatus.equals(CHALLENGE_SUBMITTED) && !challengeStatus.equals(CHALLENGE_GRADED)) {
-					System.out.println("entered second submitChallenges if CHALLENGE_SUBMITTED CHALLENGE_GRADED");
 					challengePage = openChallenge(challengeType);
 					challengePage.submitChallenge(student, challengeType);
 				}
