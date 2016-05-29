@@ -17,6 +17,13 @@ import com.brainchase.items.Transaction;
  */
 public class HTMLBuilder {
 
+	/**
+	 * This method is to create HTML report
+	 * 
+	 * @param transactions
+	 * @param path
+	 * 
+	 */
 	public static void create(ArrayList<HashMap<String, HashMap<String, String>>> transactions, String path)
 			throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -58,6 +65,13 @@ public class HTMLBuilder {
 		Common.writeToFile(path, sb.toString());
 	}
 
+	/**
+	 * This method is to create HTML tables for teacher and supervisor
+	 * 
+	 * @param transactions
+	 * @param path
+	 * 
+	 */
 	private static void drawNonStudent(StringBuilder sb,
 			ArrayList<HashMap<String, HashMap<String, String>>> transactions, String owner) {
 		int iterator = 0;
@@ -108,6 +122,13 @@ public class HTMLBuilder {
 
 	}
 
+	/**
+	 * This method is to ad a table into a report
+	 * 
+	 * @param transactions
+	 * @param path
+	 * 
+	 */
 	static void appendTable(StringBuilder sb, ArrayList<ArrayList<String>> table, String type) {
 		sb.append("<table>");
 		if (type.equals("dashboard")) {

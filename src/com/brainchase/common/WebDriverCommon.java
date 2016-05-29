@@ -23,7 +23,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * 
- * This class
+ * This class contains Selenium WebDriver methods
  * 
  * @author vbartashchuk@testco.com
  *
@@ -181,10 +181,6 @@ public class WebDriverCommon {
 	 * @throws InterruptedException
 	 */
 	protected void click(Object obj) throws InterruptedException {
-		// if (PropertiesUtils.get("browser").equals("ie")) {
-		// clickDouble(obj);
-		// return;
-		// }
 		logger.debug("Clicking an element '" + obj + "' on page '" + driver.getCurrentUrl() + "'");
 		WebElement element = getElement(obj);
 		try {

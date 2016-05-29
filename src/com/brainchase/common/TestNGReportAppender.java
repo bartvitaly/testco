@@ -8,6 +8,8 @@ import org.testng.Reporter;
 
 /**
  * 
+ * This class describes TestNG appender
+ * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -19,6 +21,10 @@ public class TestNGReportAppender extends AppenderSkeleton {
 		Reporter.log(eventToString(event));
 	}
 
+	/**
+	 * This method is to convert an assertion event to a string
+	 * 
+	 */
 	private String eventToString(final LoggingEvent event) {
 		m_assert.assertFalse(event.getLevel() == Level.ERROR, event.getMessage().toString());
 		final StringBuilder result = new StringBuilder(event.getRenderedMessage());
@@ -32,6 +38,10 @@ public class TestNGReportAppender extends AppenderSkeleton {
 		return result.toString();
 	}
 
+	/**
+	 * This method is to get assertion
+	 * 
+	 */
 	public SoftAssert getAssert() {
 		return m_assert;
 	}

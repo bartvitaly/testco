@@ -65,7 +65,7 @@ public class Common {
 	/**
 	 * This method is to generate random string with words count
 	 * 
-	 * @param length
+	 * @param numberOfWords
 	 * @return String
 	 * 
 	 */
@@ -145,7 +145,6 @@ public class Common {
 	 * This method is to read from file to array
 	 * 
 	 * @param filename
-	 * @param encoding
 	 * @return String
 	 * 
 	 */

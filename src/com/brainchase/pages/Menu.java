@@ -35,7 +35,7 @@ public class Menu extends WebDriverCommon {
 	}
 
 	/**
-	 * This method logs in a user
+	 * This method logs out a user
 	 * 
 	 * @return LoginPage
 	 * @throws InterruptedException

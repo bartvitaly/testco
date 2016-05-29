@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import com.brainchase.common.PropertiesUtils;
 import com.brainchase.items.Student;
 
 /**
@@ -24,18 +25,20 @@ public class DashboardStudentPage extends Menu {
 	static String CHALLENGE_GRADED = "challenge-status-1";
 	static String CHALLENGE_ACTIVE = "challenge-status-0";
 
+	static String WEEK = ".week1 ";
+
 	static By welcomePopup = By.cssSelector("[style*='visible'] .joyride-close-tip");
 
-	private static By introductory = By.cssSelector(".intro-video a");
+	private static By introductory = By.cssSelector(getWeek() + ".intro-video a");
 	private static By videoClose = By.cssSelector(".fancybox-close");
 	private static By weekContainer = By.cssSelector(".week-container");
 
-	private static By artChallenge = By.cssSelector("[style*='art']");
-	private static By bonusChallenge = By.cssSelector("[style*='bonus']");
-	private static By engineeringChallenge = By.cssSelector("[style*='engineering']");
-	private static By mathChallenge = By.cssSelector("[style*='math']");
-	private static By readingChallenge = By.cssSelector("[style*='reading']");
-	private static By writingChallenge = By.cssSelector("[style*='writing']");
+	private static By artChallenge = By.cssSelector(getWeek() + "[style*='art']");
+	private static By bonusChallenge = By.cssSelector(getWeek() + "[style*='bonus']");
+	private static By engineeringChallenge = By.cssSelector(getWeek() + "[style*='engineering']");
+	private static By mathChallenge = By.cssSelector(getWeek() + "[style*='math']");
+	private static By readingChallenge = By.cssSelector(getWeek() + "[style*='reading']");
+	private static By writingChallenge = By.cssSelector(getWeek() + "[style*='writing']");
 
 	// Challenge page
 	private static By response = By.cssSelector("[id=edit-student-input]");
@@ -50,6 +53,17 @@ public class DashboardStudentPage extends Menu {
 		super(driver);
 		logger.info("Opened Student's Dashboard page");
 		super.driver.navigate().refresh();
+	}
+
+	/**
+	 * This method gets a week number
+	 * 
+	 * @return String
+	 * @throws InterruptedException
+	 */
+	public static String getWeek() {
+		int weekNumber = PropertiesUtils.getInt("week") + 1;
+		return ".week" + String.valueOf(weekNumber) + " ";
 	}
 
 	/**

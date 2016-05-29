@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -47,11 +48,19 @@ public class DemoTest extends Initialize {
 
 	ArrayList<HashMap<String, HashMap<String, String>>> transactions = new ArrayList<HashMap<String, HashMap<String, String>>>();
 
-	HashMap<String, HashMap<String, String>> transactionsStudent = Transaction.getTransactionsHashMap();
+	static HashMap<String, HashMap<String, String>> transactionsStudent = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> dashboardTeacher = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> transactionsTeacher = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> dashboardSupervisor = Transaction.getTransactionsHashMap();
 	HashMap<String, HashMap<String, String>> transactionsSupervisor = Transaction.getTransactionsHashMap();
+
+	static ConcurrentHashMap<String, HashMap<String, String>> transactionsCopyTeacher = Transaction
+			.getTransactionsConcurrentHashMap();
+	static ConcurrentHashMap<String, HashMap<String, String>> transactionsCopySupervisor = Transaction
+			.getTransactionsConcurrentHashMap();
+
+	Boolean teacherDashboardVerified = false;
+	Boolean supervisorDashboardVerified = false;
 
 	@BeforeMethod(groups = { "demo" })
 	public void setUp() throws Exception {
@@ -73,6 +82,17 @@ public class DemoTest extends Initialize {
 		users = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student").get(0);
 		allUsers = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "student").get(1);
 		return User.getUsers(users, PropertiesUtils.getInt("students_number"));
+	}
+
+	/**
+	 * This is data provider for running the same test with different data
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	@DataProvider(parallel = true, name = "transactionsProvider")
+	public static Transaction[][] transactions() throws IOException {
+		return Transaction.getTransactions(transactionsStudent);
 	}
 
 	@Test(groups = { "demo" })
@@ -104,48 +124,65 @@ public class DemoTest extends Initialize {
 		synchronized (transactionsStudent) {
 			transactionsStudent = Transaction.addTransactions(transactionsStudent, student.getTransactions());
 		}
+
+		synchronized (transactionsCopyTeacher) {
+			transactionsCopyTeacher = Transaction.addTransactions(transactionsCopyTeacher, student.getTransactions());
+		}
+
+		synchronized (transactionsCopySupervisor) {
+			transactionsCopySupervisor = Transaction.addTransactions(transactionsCopySupervisor,
+					student.getTransactions());
+		}
 	}
 
-	@Test(groups = { "demo" }, dependsOnMethods = { "student" })
-	public void teacher() throws Exception {
-		// Get a teacher data from file
+	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "student" })
+	public void teacher(Transaction transaction) throws Exception {
 		User teacher = CsvFileReader.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "teacher")
 				.get(0).get(0);
-
 		// Go to Dashboard page
-		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(teacher);
+		LoginPage loginPage = new LoginPage(driver.get());
+		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) loginPage.login(teacher);
 
 		// Check transactions are shown on Dashboard
-		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardTeacher = dashboardPage.allAssignments;
+		synchronized (teacherDashboardVerified) {
+			if (!teacherDashboardVerified) {
+				teacherDashboardVerified = true;
+				dashboardPage.checkAssignments(transactionsStudent);
+				dashboardTeacher = Transaction.addTransactions(dashboardTeacher, dashboardPage.allAssignments);
+			}
+		}
 
 		// Grade an assignment
-		dashboardPage.grade(teacher, gradeNumber);
+		dashboardPage.grade(teacher, transactionsCopyTeacher);
 		dashboardPage.logout();
 
 		// Write teacher transactions to a file
-		transactionsTeacher = teacher.getTransactions();
+		transactionsTeacher = Transaction.addTransactions(transactionsTeacher, teacher.getTransactions());
 	}
 
-	@Test(groups = { "demo" }, dependsOnMethods = { "teacher" })
-	public void supervisor() throws Exception {
-		// Get a teacher data from file
+	@Test(groups = { "demo" }, dataProvider = "transactionsProvider", dependsOnMethods = { "teacher" })
+	public void supervisor(Transaction transaction) throws Exception {
 		User supervisor = CsvFileReader
 				.readUsersFile(Common.canonicalPath() + File.separator + "users.csv", "supervisor").get(0).get(0);
-
 		// Go to Dashboard page
-		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) login(supervisor);
+		LoginPage loginPage = new LoginPage(driver.get());
+		DashboardSupervisorPage dashboardPage = (DashboardSupervisorPage) loginPage.login(supervisor);
 
 		// Check transactions are shown on Dashboard
-		dashboardPage.checkAssignments(transactionsStudent);
-		dashboardSupervisor = dashboardPage.allAssignments;
+		synchronized (supervisorDashboardVerified) {
+			if (!supervisorDashboardVerified) {
+				supervisorDashboardVerified = true;
+				dashboardPage.checkAssignments(transactionsStudent);
+				dashboardSupervisor = Transaction.addTransactions(dashboardSupervisor, dashboardPage.allAssignments);
+			}
+		}
 
 		// Grade an assignment
-		dashboardPage.grade(supervisor, gradeNumber);
+		dashboardPage.grade(supervisor, transactionsCopySupervisor);
 		dashboardPage.logout();
 
 		// Write teacher transactions to a file
-		transactionsSupervisor = supervisor.getTransactions();
+		transactionsSupervisor = Transaction.addTransactions(transactionsSupervisor, supervisor.getTransactions());
 	}
 
 	public void clear(User user) throws Exception {
@@ -153,7 +190,7 @@ public class DemoTest extends Initialize {
 		DashboardTeacherPage dashboardPage = (DashboardTeacherPage) login(user);
 
 		// Grade an assignment
-		dashboardPage.grade(user, PropertiesUtils.getInt("grade_number"));
+		dashboardPage.grade(PropertiesUtils.getInt("grade_number"));
 		dashboardPage.logout();
 	}
 

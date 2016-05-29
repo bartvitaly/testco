@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -14,6 +15,7 @@ import org.openqa.selenium.WebElement;
 
 import com.brainchase.common.Common;
 import com.brainchase.common.CsvFileReader;
+import com.brainchase.common.PropertiesUtils;
 import com.brainchase.items.Challenge;
 import com.brainchase.items.Transaction;
 import com.brainchase.items.User;
@@ -50,6 +52,9 @@ public class DashboardTeacherPage extends Menu {
 	static By nonWriting = By.cssSelector(".small-12:nth-child(2) tbody tr");
 	static By writing = By.cssSelector(".small-12:nth-child(3) tbody tr");
 
+	// Grading page
+	private static By accepted = By.cssSelector("[id=edit-accepted-1]");
+
 	/**
 	 * This is constructor that sets a web driver for the page object
 	 * 
@@ -79,14 +84,14 @@ public class DashboardTeacherPage extends Menu {
 	/**
 	 * This method is to grade student's assignments
 	 * 
-	 * @param assignments
-	 * @return ArrayList<ArrayList<String>>
+	 * @param user
+	 * @param maxAssignmentsToGrade
 	 * @throws InterruptedException
 	 * 
 	 */
 	public void grade(User user, int maxAssignmentsToGrade) throws InterruptedException {
 		for (int i = 0; i < maxAssignmentsToGrade; i++) {
-			if (!getNewAssignmentToGrade()) {
+			if (!present(gradeIt)) {
 				break;
 			}
 
@@ -96,7 +101,11 @@ public class DashboardTeacherPage extends Menu {
 			String type = getText(challengeType).toLowerCase();
 
 			// Grade a challenge and store transactionId
-			click(gradeIt);
+			int j = 0;
+			while (!present(accepted) && j < 10) {
+				click(gradeIt);
+			}
+
 			GradingPage gradingPage = new GradingPage(driver);
 			gradingPage.grade(true, "commentsText");
 
@@ -104,6 +113,57 @@ public class DashboardTeacherPage extends Menu {
 			if (user.getTransactions().containsKey(type)) {
 				user.getTransactions().get(type).put(name, gradingPage.transactionId);
 			}
+		}
+	}
+
+	/**
+	 * This method is to grade student's assignments without saving them
+	 * 
+	 * @param assignments
+	 * @throws InterruptedException
+	 * 
+	 */
+	public void grade(int maxAssignmentsToGrade) throws InterruptedException {
+		for (int i = 0; i < maxAssignmentsToGrade; i++) {
+			if (!getNewAssignmentToGrade()) {
+				break;
+			}
+
+			// Grade a challenge and store transactionId
+			int j = 0;
+			while (!present(accepted) && j < 10) {
+				click(gradeIt);
+			}
+
+			GradingPage gradingPage = new GradingPage(driver);
+			gradingPage.grade(true, "commentsText");
+		}
+	}
+
+	/**
+	 * This method is to grade an assignment
+	 * 
+	 * @param user
+	 * @param transactions
+	 * @throws InterruptedException
+	 * 
+	 */
+	public void grade(User user, ConcurrentHashMap<String, HashMap<String, String>> transactions)
+			throws InterruptedException {
+		int i = 0;
+		int maxIterations = PropertiesUtils.getInt("grade_number");
+		while (getNewAssignmentToGrade() && i < maxIterations) {
+			String challengeTypeToGrade = getAttribute(challengeType, "text").toLowerCase();
+			String studentToGrade = getText(studentName);
+			studentToGrade = studentToGrade.substring(0, studentToGrade.indexOf(" "));
+
+			Boolean transactionRemoved = Transaction.removeTransaction(transactions, challengeTypeToGrade,
+					studentToGrade);
+
+			if (transactionRemoved) {
+				grade(user, 1);
+			}
+			i++;
 		}
 	}
 

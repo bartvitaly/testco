@@ -13,6 +13,9 @@ import com.brainchase.items.Challenge;
 import com.brainchase.items.User;
 
 /**
+ * 
+ * This class is to read csv files
+ * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -40,6 +43,14 @@ public class CsvFileReader {
 	private static final String READING = "reading";
 	private static final String WRITING = "writing";
 
+	/**
+	 * This method is to read users' File
+	 * 
+	 * @param fileName
+	 * @param type
+	 * @return ArrayList<ArrayList<User>>
+	 * 
+	 */
 	public static ArrayList<ArrayList<User>> readUsersFile(String fileName, String type) {
 
 		FileReader fileReader = null;
@@ -93,6 +104,14 @@ public class CsvFileReader {
 
 	}
 
+	/**
+	 * This method is to read challenges' File
+	 * 
+	 * @param fileName
+	 * @param type
+	 * @return ArrayList<ArrayList<User>>
+	 * 
+	 */
 	public static ArrayList<Challenge> readChallengesFile(String fileName) {
 
 		FileReader fileReader = null;

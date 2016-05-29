@@ -20,6 +20,13 @@ public class PropertiesUtils {
 	final static String TEST_PROPERTIES = File.separator + "brainchase.properties";
 	final static Logger logger = Logger.getLogger(PropertiesUtils.class);
 
+	/**
+	 * This method is to get a string variable from properties file
+	 * 
+	 * @param key
+	 * @return String
+	 * 
+	 */
 	public static String get(String key) {
 
 		Properties properties = new Properties();
@@ -36,6 +43,13 @@ public class PropertiesUtils {
 		return result;
 	}
 
+	/**
+	 * This method is to get an integer variable from properties file
+	 * 
+	 * @param key
+	 * @return Integer
+	 * 
+	 */
 	public static int getInt(String key) {
 		return Integer.valueOf(get(key));
 	}

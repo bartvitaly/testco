@@ -8,6 +8,8 @@ import org.testng.collections.Maps;
 
 /**
  * 
+ * This class is to make final assertion
+ * 
  * @author vbartashchuk@testco.com
  *
  */
@@ -24,6 +26,10 @@ public class SoftAssert extends Assertion {
 		}
 	}
 
+	/**
+	 * This method is to make final assertion
+	 * 
+	 */
 	public void assertAll() {
 		if (!m_errors.isEmpty()) {
 			StringBuilder sb = new StringBuilder("The following asserts failed:\n");

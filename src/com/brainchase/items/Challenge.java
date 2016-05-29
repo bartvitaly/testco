@@ -4,13 +4,15 @@ import com.brainchase.common.Common;
 
 /**
  * 
+ * This class defines Challenge object
+ * 
  * @author vbartashchuk@testco.com
  *
  */
 public class Challenge {
 
 	public String type, externalLink, response, image, answer;
-	
+
 	/**
 	 * This is constructor of the class
 	 * 
@@ -27,8 +29,8 @@ public class Challenge {
 		this.response = response;
 		this.image = image;
 		this.answer = answer;
-	}	
-	
+	}
+
 	/**
 	 * This is constructor of the class
 	 * 
@@ -41,8 +43,6 @@ public class Challenge {
 		this.response = Common.randomStringWordsCount(200);
 		this.image = null;
 		this.answer = Common.randomString(20);
-	}	
-	
-	
-	
+	}
+
 }
